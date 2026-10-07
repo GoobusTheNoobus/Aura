@@ -42,7 +42,8 @@ std::unique_ptr<BaseAST> Parser::parse_expression() {
 std::unique_ptr<BaseAST> Parser::parse_additive() {
     auto left = parse_multiplicative();
 
-    while (pos < tokens.size() - 1 && (tokens[pos].kind == TokenKind::Plus || tokens[pos].kind == TokenKind::Minus)) {
+    while (pos < tokens.size() - 1 &&
+           (tokens[pos].kind == TokenKind::Plus || tokens[pos].kind == TokenKind::Minus)) {
         TokenKind op = tokens[pos++].kind;
 
         auto right = parse_multiplicative();
@@ -55,7 +56,8 @@ std::unique_ptr<BaseAST> Parser::parse_additive() {
 std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
     auto left = parse_primary();
 
-    while (pos < tokens.size() - 1 && (tokens[pos].kind == TokenKind::Star || tokens[pos].kind == TokenKind::Slash)) {
+    while (pos < tokens.size() - 1 &&
+           (tokens[pos].kind == TokenKind::Star || tokens[pos].kind == TokenKind::Slash)) {
         TokenKind op = tokens[pos++].kind;
 
         auto right = parse_primary();
@@ -67,26 +69,23 @@ std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
 
 std::unique_ptr<BaseAST> Parser::parse_primary() {
     switch (tokens[pos].kind) {
-        case parse::TokenKind::FloatLiteral:
-            return std::make_unique<FloatLiteral>(std::stod(tokens[pos++].value));
-        case parse::TokenKind::IntLiteral:
-            return std::make_unique<IntLiteral>(std::stoi(tokens[pos++].value));
-        case parse::TokenKind::Identifier:
-            return std::make_unique<Identifier>(tokens[pos++].value);
-        case parse::TokenKind::LeftParen:{
-            ++pos;
-            auto expr = parse_expression();
-            if (tokens[pos++].kind != TokenKind::RightParen) {
-                std::cerr << "Expected ')'";
-            }
-            return expr;
+    case parse::TokenKind::FloatLiteral:
+        return std::make_unique<FloatLiteral>(std::stod(tokens[pos++].value));
+    case parse::TokenKind::IntLiteral:
+        return std::make_unique<IntLiteral>(std::stoi(tokens[pos++].value));
+    case parse::TokenKind::Identifier: return std::make_unique<Identifier>(tokens[pos++].value);
+    case parse::TokenKind::LeftParen: {
+        ++pos;
+        auto expr = parse_expression();
+        if (tokens[pos++].kind != TokenKind::RightParen) {
+            std::cerr << "Expected ')'";
         }
-        default:
-            std::cerr << "Expected expression, got '" << tokens[pos++].value << "'\n'";
-            return nullptr;
+        return expr;
+    }
+    default:
+        std::cerr << "Expected expression, got '" << tokens[pos++].value << "'\n'";
+        return nullptr;
     }
 }
 
-
-
-}
+} // namespace parse

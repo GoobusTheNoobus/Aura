@@ -47,8 +47,9 @@ enum class ASTKind {
 
 struct BaseAST {
     ASTKind kind;
-    BaseAST(ASTKind kind) : kind(kind) {}
-    virtual ~BaseAST() = default; 
+    BaseAST(ASTKind kind) : kind(kind) {
+    }
+    virtual ~BaseAST() = default;
     virtual void print(std::ostream& out, int indent) const {
         out << std::string(indent, ' ') << "BaseAST\n";
     }
@@ -58,18 +59,20 @@ struct Program : BaseAST {
     // we use std::unique_ptr BaseAST for ambiguous nodes
     std::vector<std::unique_ptr<BaseAST>> children;
 
-    Program() : BaseAST(ASTKind::Program) {}
+    Program() : BaseAST(ASTKind::Program) {
+    }
     void print(std::ostream& out, int indent) const override {
         for (auto& node : children) {
             node->print(out, indent);
         }
-    } 
+    }
 };
 
 // Represents a variable
 struct Identifier : BaseAST {
     std::string name;
-    Identifier(std::string name) : BaseAST(ASTKind::Identifier), name(std::move(name)) {}
+    Identifier(std::string name) : BaseAST(ASTKind::Identifier), name(std::move(name)) {
+    }
     void print(std::ostream& out, int indent) const override {
         out << std::string(indent, ' ') << "Identifier('" << name << "')\n";
     }
@@ -77,9 +80,10 @@ struct Identifier : BaseAST {
 
 // Represent a raw integer literal
 struct IntLiteral : BaseAST {
-    int32_t value; 
+    int32_t value;
 
-    IntLiteral(int32_t value) : BaseAST(ASTKind::IntLiteral), value(value) {}
+    IntLiteral(int32_t value) : BaseAST(ASTKind::IntLiteral), value(value) {
+    }
     void print(std::ostream& out, int indent) const override {
         out << std::string(indent, ' ') << "IntLiteral(" << value << ")\n";
     }
@@ -87,9 +91,10 @@ struct IntLiteral : BaseAST {
 
 // Represents a raw floating point literal
 struct FloatLiteral : BaseAST {
-    double value; 
+    double value;
 
-    FloatLiteral(double value) : BaseAST(ASTKind::FloatLiteral), value(value) {}
+    FloatLiteral(double value) : BaseAST(ASTKind::FloatLiteral), value(value) {
+    }
     void print(std::ostream& out, int indent) const override {
         out << std::string(indent, ' ') << "FloatLiteral(" << value << ")\n";
     }
@@ -98,15 +103,16 @@ struct FloatLiteral : BaseAST {
 struct BinaryOperation : BaseAST {
     std::unique_ptr<BaseAST> left, right;
     TokenKind op;
-    
+
     BinaryOperation(std::unique_ptr<BaseAST> left, std::unique_ptr<BaseAST> right, TokenKind op)
-        : BaseAST(ASTKind::BinaryOperation), left(std::move(left)), right(std::move(right)), op(op) {
+        : BaseAST(ASTKind::BinaryOperation), left(std::move(left)), right(std::move(right)),
+          op(op) {
     }
     void print(std::ostream& out, int indent) const override {
         out << std::string(indent, ' ') << "BinaryOperation(" << token_kind_to_string(op) << ")\n";
         left->print(out, indent + 2);
         right->print(out, indent + 2);
-    } 
+    }
 };
 
 } // namespace parse

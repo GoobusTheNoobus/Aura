@@ -32,7 +32,6 @@ struct Parser {
     [[nodiscard]] Program parse();
 
     private:
-
     // We store a copy of the token list so we don't need to pass it through
     // every single helper function
     const std::vector<Token> tokens;
@@ -40,10 +39,10 @@ struct Parser {
     // We also store an index of which token we are looking at currently
     size_t pos{0};
 
-    std::unique_ptr<BaseAST> parse_expression();    
+    std::unique_ptr<BaseAST> parse_expression();
     std::unique_ptr<BaseAST> parse_additive();
     std::unique_ptr<BaseAST> parse_multiplicative();
-    std::unique_ptr<BaseAST> parse_primary();     
+    std::unique_ptr<BaseAST> parse_primary();
 };
-    
-}
+
+} // namespace parse
