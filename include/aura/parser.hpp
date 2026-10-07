@@ -17,37 +17,33 @@
  * All rights reserved.
  */
 
-#pragma once
-
-#include "token.hpp"
+#include "ast.hpp"
+#include "lexer.hpp"
 #include <cstddef>
-#include <string>
+#include <memory>
 #include <vector>
 
 namespace parse {
 
-struct Lexer {
-
-    Lexer(std::string source) : source(std::move(source)) {
+struct Parser {
+    Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {
     }
 
-    [[nodiscard]] std::vector<Token> tokenize();
+    [[nodiscard]] Program parse();
 
     private:
-    // We store a copy of the source code so we don't need to pass it
-    // through every helper function
-    const std::string source;
 
-    // We also store an index of where we are in the source code.
+    // We store a copy of the token list so we don't need to pass it through
+    // every single helper function
+    const std::vector<Token> tokens;
+
+    // We also store an index of which token we are looking at currently
     size_t pos{0};
 
-    // Skips the line when encountering double slashes for comments
-    void skip_comments();
-
-    // Tokenizes when encountering a number digit
-    void tokenize_number(std::vector<Token>& tokens);
-
-    // Tokenizes when encountering a letter or underscore
-    void tokenize_word(std::vector<Token>& tokens);
+    std::unique_ptr<BaseAST> parse_expression();    
+    std::unique_ptr<BaseAST> parse_additive();
+    std::unique_ptr<BaseAST> parse_multiplicative();
+    std::unique_ptr<BaseAST> parse_primary();     
 };
-} // namespace parse
+    
+}

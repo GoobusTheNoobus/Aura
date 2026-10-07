@@ -20,6 +20,7 @@
 #define VERSION "0.1.0"
 
 #include "aura/lexer.hpp"
+#include "aura/parser.hpp"
 #include <iostream>
 
 int main() {
@@ -51,6 +52,8 @@ int main() {
         }
 
         parse::Lexer lexer(input);
-        std::cout << lexer.tokenize() << std::endl;
+        parse::Parser parser(lexer.tokenize());
+        parse::Program program = parser.parse();
+        program.print(std::cout, 0);
     }
 }
