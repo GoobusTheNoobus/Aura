@@ -28,7 +28,9 @@ namespace parse {
 Program Parser::parse() {
     Program program;
 
-    while (pos < tokens.size() - 1) {
+    // we loop and parse until we reach the end of the file
+    while (!end()) {
+        // Only expressions are handled as of right now.
         program.children.push_back(parse_expression());
     }
 
@@ -36,16 +38,20 @@ Program Parser::parse() {
 }
 
 std::unique_ptr<BaseAST> Parser::parse_expression() {
+    // Just a wrapper function around the lowest precedence parsing helper
     return parse_additive();
 }
 
 std::unique_ptr<BaseAST> Parser::parse_additive() {
+    // we parse the left side
     auto left = parse_multiplicative();
 
-    while (pos < tokens.size() - 1 &&
-           (tokens[pos].kind == TokenKind::Plus || tokens[pos].kind == TokenKind::Minus)) {
-        TokenKind op = tokens[pos++].kind;
+    // We loop until we can't see the operator that we are trying to parse.
+    while (!end() && (peek().kind == TokenKind::Plus || peek().kind == TokenKind::Minus)) {
+        TokenKind op = next().kind;
 
+        // After parsing the right hand side, we create a binary op storing both the left and the
+        // right side before storing the entire operation in the left side
         auto right = parse_multiplicative();
         left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
     }
@@ -54,12 +60,15 @@ std::unique_ptr<BaseAST> Parser::parse_additive() {
 }
 
 std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
+    // we parse the left side
     auto left = parse_primary();
 
-    while (pos < tokens.size() - 1 &&
-           (tokens[pos].kind == TokenKind::Star || tokens[pos].kind == TokenKind::Slash)) {
-        TokenKind op = tokens[pos++].kind;
+    // We loop until we can't see the operator that we are trying to parse.
+    while (!end() && (peek().kind == TokenKind::Star || peek().kind == TokenKind::Slash)) {
+        TokenKind op = next().kind;
 
+        // After parsing the right hand side, we create a binary op storing both the left and the
+        // right side before storing the entire operation in the left side
         auto right = parse_primary();
         left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
     }
@@ -68,24 +77,50 @@ std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
 }
 
 std::unique_ptr<BaseAST> Parser::parse_primary() {
-    switch (tokens[pos].kind) {
+    switch (peek().kind) {
     case parse::TokenKind::FloatLiteral:
-        return std::make_unique<FloatLiteral>(std::stod(tokens[pos++].value));
+        return std::make_unique<FloatLiteral>(std::stod(next().value));
     case parse::TokenKind::IntLiteral:
-        return std::make_unique<IntLiteral>(std::stoi(tokens[pos++].value));
-    case parse::TokenKind::Identifier: return std::make_unique<Identifier>(tokens[pos++].value);
+        // TODO: Use from_chars and report errors
+        return std::make_unique<IntLiteral>(std::stoi(next().value));
+    case parse::TokenKind::Identifier: return std::make_unique<Identifier>(next().value);
     case parse::TokenKind::LeftParen: {
-        ++pos;
+        next();
         auto expr = parse_expression();
-        if (tokens[pos++].kind != TokenKind::RightParen) {
-            std::cerr << "Expected ')'";
+        if (next().kind != TokenKind::RightParen) {
+            std::cerr << ANSI_RED "ERROR: Expected ')'\n" ANSI_RESET;
         }
         return expr;
     }
     default:
-        std::cerr << "Expected expression, got '" << tokens[pos++].value << "'\n'";
-        return nullptr;
+        std::cerr << ANSI_RED "ERROR: Expected expression, got '" << next().value
+                  << "'\n" ANSI_RESET;
+        return std::make_unique<ErrorNode>();
     }
+}
+
+bool Parser::end() const {
+    return pos >= tokens.size() - 1; // The last token is EOF
+}
+
+const Token& Parser::peek() const {
+    return pos < tokens.size() ? tokens[pos] : tokens.back();
+}
+
+const Token& Parser::peek(isize offset) const {
+    const isize index = static_cast<isize>(pos) + offset;
+
+    if (index < 0 || index >= static_cast<isize>(tokens.size())) {
+        return tokens.back();
+    }
+
+    return tokens[static_cast<std::size_t>(index)];
+}
+
+const Token& Parser::next() {
+    const Token& token = peek();
+    ++pos;
+    return token;
 }
 
 } // namespace parse

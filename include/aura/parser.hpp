@@ -18,7 +18,6 @@
  */
 
 #include "ast.hpp"
-#include "lexer.hpp"
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -39,10 +38,31 @@ struct Parser {
     // We also store an index of which token we are looking at currently
     size_t pos{0};
 
+    // A wrapper to the lowest precedence function
     std::unique_ptr<BaseAST> parse_expression();
+
+    // The following functions are sorted from lowest precedence to highest
+
+    // Addition/Subtraction
     std::unique_ptr<BaseAST> parse_additive();
+
+    // Multiplication/Division
     std::unique_ptr<BaseAST> parse_multiplicative();
+
+    // Primary (int literal, float literal, parentheses, etc)
     std::unique_ptr<BaseAST> parse_primary();
+
+    // Checks if our cursor is at the end of the token list
+    bool end() const;
+
+    // Gets the current token
+    const Token& peek() const;
+
+    // Gets a token with a certain offset from our cursor token
+    const Token& peek(isize offset) const;
+
+    // Advances the cursor by one, but return the token at the original cursor token
+    const Token& next();
 };
 
 } // namespace parse

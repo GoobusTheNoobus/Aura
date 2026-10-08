@@ -26,7 +26,7 @@ namespace parse {
 std::vector<Token> Lexer::tokenize() {
     // We return early if there is nothing to tokenize
     if (source.empty()) {
-        return {{"", TokenKind::EndOfFile}};
+        return {{"EOF", TokenKind::EndOfFile}};
     }
 
     // A temporary token list to push to
@@ -36,12 +36,12 @@ std::vector<Token> Lexer::tokenize() {
     // We don't use a for loop, since inside this big while loop contains
     // multiple small while loops that can increment pos many times every
     // iteration
-    while (pos < source.size()) {
-        char current = source[pos];
+    while (!end()) {
+        char current = peek();
 
         // We first check if the character is a whitespace
         if (std::isspace(static_cast<unsigned char>(current))) {
-            ++pos;
+            next();
             continue;
         }
 
@@ -49,37 +49,37 @@ std::vector<Token> Lexer::tokenize() {
         switch (current) {
         case '(':
             tokens.push_back({"(", TokenKind::LeftParen});
-            ++pos;
+            next();
             continue;
         case ')':
             tokens.push_back({")", TokenKind::RightParen});
-            ++pos;
+            next();
             continue;
         case '+':
             tokens.push_back({"+", TokenKind::Plus});
-            ++pos;
+            next();
             continue;
         case '-':
             tokens.push_back({"-", TokenKind::Minus});
-            ++pos;
+            next();
             continue;
         case '*':
             tokens.push_back({"*", TokenKind::Star});
-            ++pos;
+            next();
             continue;
         case '/':
 
             // The forward slash is a bit different, since we could
             // be dealing with a single slash for division, or a double
             // slash for comment.
-            if (pos < source.size() - 1 && source[pos + 1] == '/') {
+            if (peek(1) == '/') {
                 skip_comments();
                 continue;
             }
 
             // Otherwise, its just a plain old slash
             tokens.push_back({"/", TokenKind::Slash});
-            ++pos;
+            next();
             continue;
 
         default: break;
@@ -98,17 +98,16 @@ std::vector<Token> Lexer::tokenize() {
         }
 
         // Unknown symbol: throw tantrum
-        std::cerr << "Unexpected character '" << current << "'\n";
-        ++pos;
+        std::cerr << ANSI_RED "ERROR: Unexpected character '" << next() << "'\n" ANSI_RESET;
     }
 
-    tokens.push_back({"", TokenKind::EndOfFile});
+    tokens.push_back({"EOF", TokenKind::EndOfFile});
     return tokens;
 }
 
 void Lexer::skip_comments() {
-    while (pos < source.size() && source[pos] != '\n') {
-        ++pos;
+    while (!end() && peek() != '\n') {
+        next();
     }
 }
 
@@ -123,19 +122,18 @@ void Lexer::tokenize_number(std::vector<Token>& tokens) {
 
     bool error_encountered = false;
 
-    while (pos < source.size() &&
-           (source[pos] == '.' || std::isdigit(static_cast<unsigned char>(source[pos])))) {
+    while (!end() && (peek() == '.' || std::isdigit(static_cast<unsigned char>(peek())))) {
 
-        if (source[pos] == '.') {
+        if (peek() == '.') {
             if (kind == TokenKind::FloatLiteral && !error_encountered) {
-                std::cerr << "ERROR: Too many dots in float literal\n";
+                std::cerr << ANSI_RED "ERROR: Too many dots in float literal\n" ANSI_RESET;
                 error_encountered = true;
             }
 
             kind = TokenKind::FloatLiteral;
         }
 
-        value.push_back(source[pos++]);
+        value.push_back(next());
     }
 
     tokens.push_back({value, kind});
@@ -144,13 +142,31 @@ void Lexer::tokenize_number(std::vector<Token>& tokens) {
 void Lexer::tokenize_word(std::vector<Token>& tokens) {
     std::string value;
 
-    while (pos < source.size() &&
-           (source[pos] == '_' || std::isalnum(static_cast<unsigned char>(source[pos])))) {
-        value.push_back(source[pos++]);
+    while (!end() && (peek() == '_' || std::isalnum(static_cast<unsigned char>(peek())))) {
+        value.push_back(next());
     }
 
     // Currently, we only handle identifiers, since no keywords have been added
     // yet
     tokens.push_back({value, TokenKind::Identifier});
 }
+
+bool Lexer::end() const {
+    return pos >= source.size();
+}
+
+char Lexer::peek() const {
+    return pos < source.size() ? source[pos] : '\0';
+}
+
+char Lexer::peek(isize offset) const {
+    return pos < source.size() - offset ? source[pos + offset] : '\0';
+}
+
+char Lexer::next() {
+    char c = peek();
+    ++pos;
+    return c;
+}
+
 } // namespace parse

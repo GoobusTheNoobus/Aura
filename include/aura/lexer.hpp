@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "ast.hpp"
 #include "token.hpp"
 #include <cstddef>
 #include <string>
@@ -49,5 +50,17 @@ struct Lexer {
 
     // Tokenizes when encountering a letter or underscore
     void tokenize_word(std::vector<Token>& tokens);
+
+    // Checks if our cursor is at the end of the source code
+    bool end() const;
+
+    // Gets the current character
+    char peek() const;
+
+    // Gets a character with a certain offset from our cursor character
+    char peek(isize offset) const;
+
+    // Advances the cursor by one, but return the character at the original cursor character
+    char next();
 };
 } // namespace parse

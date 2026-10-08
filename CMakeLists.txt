@@ -6,13 +6,40 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(aura)
+
 target_include_directories(aura PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Object generation flags
 target_compile_options(aura PRIVATE
-    -fsanitize=address,undefined
-    -fno-omit-frame-pointer -g -g3
+
+    # Debug info + sanitizer for debug
+    $<$<CONFIG:Debug>:
+        -g
+        -O0
+        -fno-omit-frame-pointer
+        -fsanitize=address,undefined
+    >
+    
+    # Optimizations for release
+    $<$<CONFIG:Release>:
+        -O3
+        -DNDEBUG
+        -march=native
+    >
+
+    # Compiler warning flags
+    -Wall
+    -Wextra
+    -Wpedantic
 )
+
+# Executable linking flags
 target_link_options(aura PRIVATE
-    -fsanitize=address,undefined
+    # for sanitizers
+    $<$<CONFIG:Debug>:
+        -g
+        -fsanitize=address,undefined
+    >
 )
 
 target_sources(aura PRIVATE 
@@ -25,5 +52,6 @@ target_sources(aura PRIVATE
     include/aura/lexer.hpp
     include/aura/ast.hpp
     include/aura/parser.hpp
+    include/aura/core.hpp
 )
 
