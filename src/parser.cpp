@@ -19,8 +19,8 @@
 
 #include "aura/parser.hpp"
 #include "aura/ast.hpp"
+#include "aura/diagnostic.hpp"
 #include "aura/token.hpp"
-#include <iostream>
 #include <memory>
 
 namespace parse {
@@ -88,13 +88,12 @@ std::unique_ptr<BaseAST> Parser::parse_primary() {
         next();
         auto expr = parse_expression();
         if (next().kind != TokenKind::RightParen) {
-            std::cerr << ANSI_RED "ERROR: Expected ')'\n" ANSI_RESET;
+            report_error(ErrorKind::Parsing, "Expected ')'\n");
         }
         return expr;
     }
     default:
-        std::cerr << ANSI_RED "ERROR: Expected expression, got '" << next().value
-                  << "'\n" ANSI_RESET;
+        report_error(ErrorKind::Parsing, "Expected expression, got '{}'", next().value);
         return std::make_unique<ErrorNode>();
     }
 }

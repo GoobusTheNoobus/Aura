@@ -21,8 +21,12 @@
 #include <cstdint>
 
 // These colours can be used for error/warnings
-#define ANSI_RESET "\033[0m"
-#define ANSI_RED "\033[31m"
+namespace ansi {
+
+inline constexpr char Red[] = "\033[31m";
+inline constexpr char Reset[] = "\033[0m";
+
+} // namespace ansi
 
 // Rust-style type aliases
 using u8 = uint8_t;

@@ -18,8 +18,8 @@
  */
 
 #include "aura/lexer.hpp"
+#include "aura/diagnostic.hpp"
 #include "aura/token.hpp"
-#include <iostream>
 
 namespace parse {
 
@@ -98,7 +98,7 @@ std::vector<Token> Lexer::tokenize() {
         }
 
         // Unknown symbol: throw tantrum
-        std::cerr << ANSI_RED "ERROR: Unexpected character '" << next() << "'\n" ANSI_RESET;
+        report_error(ErrorKind::Parsing, "Unexpected character '{}'", next());
     }
 
     tokens.push_back({"EOF", TokenKind::EndOfFile});
@@ -126,7 +126,7 @@ void Lexer::tokenize_number(std::vector<Token>& tokens) {
 
         if (peek() == '.') {
             if (kind == TokenKind::FloatLiteral && !error_encountered) {
-                std::cerr << ANSI_RED "ERROR: Too many dots in float literal\n" ANSI_RESET;
+                report_error(ErrorKind::Parsing, "Too many dots in float literal");
                 error_encountered = true;
             }
 

@@ -17,6 +17,7 @@
  * All rights reserved.
  */
 
+#include "aura/diagnostic.hpp"
 #define VERSION "0.1.0"
 
 #include "aura/lexer.hpp"
@@ -32,6 +33,7 @@ int main() {
     // We simulate a shell, evaluating whatever the user
     // puts in.
     while (true) {
+        error_encountered = false;
         std::cout << " >>> ";
 
         std::string input;

@@ -53,5 +53,6 @@ target_sources(aura PRIVATE
     include/aura/ast.hpp
     include/aura/parser.hpp
     include/aura/core.hpp
+    include/aura/diagnostic.hpp
 )
 
