@@ -18,11 +18,15 @@
  */
 
 #include "aura/diagnostic.hpp"
+#include "aura/evaluator.hpp"
 #define VERSION "0.1.0"
 
 #include "aura/lexer.hpp"
 #include "aura/parser.hpp"
 #include <iostream>
+
+using namespace parse;
+using namespace interpreter;
 
 int main() {
 
@@ -53,9 +57,23 @@ int main() {
             continue;
         }
 
-        parse::Lexer lexer(input);
-        parse::Parser parser(lexer.tokenize());
-        parse::Program program = parser.parse();
-        program.print(std::cout, 0);
+        Lexer lexer(input);
+        Parser parser(lexer.tokenize());
+        Program program = parser.parse();
+
+        if (error_encountered) {
+            continue;
+        }
+
+        Evaluator evaluator;
+        auto values = evaluator.evaluate(program);
+
+        if (error_encountered) {
+            continue;
+        }
+
+        for (const Value& value : values) {
+            std::cout << value << std::endl;
+        }
     }
 }

@@ -87,9 +87,10 @@ std::unique_ptr<BaseAST> Parser::parse_primary() {
     case parse::TokenKind::LeftParen: {
         next();
         auto expr = parse_expression();
-        if (next().kind != TokenKind::RightParen) {
-            report_error(ErrorKind::Parsing, "Expected ')'\n");
-        }
+        if (peek().kind != TokenKind::RightParen) {
+            report_error(ErrorKind::Parsing, "Expected ')', got '{}'", peek().value);
+        } else
+            next();
         return expr;
     }
     default:
