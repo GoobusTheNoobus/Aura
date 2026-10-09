@@ -39,7 +39,14 @@ std::vector<Token> Lexer::tokenize() {
     while (!end()) {
         char current = peek();
 
-        // We first check if the character is a whitespace
+        // We first check newline or semicolon (for seperator)
+        if (current == '\n' || current == ';') {
+            tokens.push_back({std::string(1, current), TokenKind::Separator});
+            next();
+            continue;
+        }
+
+        // We then check if the character is a whitespace
         if (std::isspace(static_cast<unsigned char>(current))) {
             next();
             continue;

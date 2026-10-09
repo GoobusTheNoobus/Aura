@@ -30,6 +30,7 @@ namespace parse {
 // signficance in Aura, they are eliminated.
 enum class TokenKind {
     EndOfFile,
+    Separator,
 
     Identifier,
 

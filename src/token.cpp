@@ -26,6 +26,8 @@ std::string token_kind_to_string(TokenKind kind) {
     switch (kind) {
     case parse::TokenKind::EndOfFile:
         return "EOF";
+    case parse::TokenKind::Separator:
+        return "Separator";
     case parse::TokenKind::FloatLiteral:
         return "FloatLiteral";
     case parse::TokenKind::IntLiteral:

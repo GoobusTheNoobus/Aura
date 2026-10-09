@@ -32,6 +32,12 @@ Program Parser::parse() {
     while (!end()) {
         // Only expressions are handled as of right now.
         program.children.push_back(parse_expression());
+
+        // Expect an expression seperator or end of file
+        if (peek().kind != TokenKind::Separator && peek().kind != TokenKind::EndOfFile) {
+            report_error(ErrorKind::Parsing, "Expected separator or EOF, got '{}'", peek().value);
+        } else
+            next();
     }
 
     return program;
