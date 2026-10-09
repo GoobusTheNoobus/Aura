@@ -24,11 +24,17 @@
 namespace interpreter {
 
 std::string Value::to_string() const {
-    switch (kind) {
-    case interpreter::ValueKind::Integer: return std::to_string(int_);
-    case interpreter::ValueKind::Float: return std::to_string(float_);
-    default: return "UNKNOWN";
-    }
+
+    // We check 1 by 1 for what type it is
+    if (const i32* data = get_if<i32>())
+        return std::to_string(*data);
+    else if (const f64* data = get_if<f64>())
+        return std::to_string(*data);
+    else if (const std::string* data = get_if<std::string>())
+        return *data;
+
+    // Probably an error value, and shouldn't print
+    return "UNKNOWN";
 }
 
 std::ostream& operator<<(std::ostream& out, const Value& value) {
