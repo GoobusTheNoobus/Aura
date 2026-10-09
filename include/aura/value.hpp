@@ -37,16 +37,13 @@ struct Value {
     Value() = default;
 
     // Constructs an integer value
-    Value(i32 value) : valid(true), data(value) {
-    }
+    Value(i32 value) : valid(true), data(value) {}
 
     // Constructs a floating point value
-    Value(f64 value) : valid(true), data(value) {
-    }
+    Value(f64 value) : valid(true), data(value) {}
 
     // Constructs a string
-    Value(std::string data) : valid(true), data(std::move(data)) {
-    }
+    Value(std::string data) : valid(true), data(std::move(data)) {}
 
     // Returns a const pointer to the value of the provided type if our data is meant to store that
     // type, otherwise a nullptr.

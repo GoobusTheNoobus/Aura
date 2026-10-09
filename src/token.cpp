@@ -22,18 +22,32 @@
 namespace parse {
 
 std::string token_kind_to_string(TokenKind kind) {
+    // Shame on C++ for not having a built in enum to string
     switch (kind) {
-    case parse::TokenKind::EndOfFile: return "EOF";
-    case parse::TokenKind::FloatLiteral: return "FloatLiteral";
-    case parse::TokenKind::IntLiteral: return "IntLiteral";
-    case parse::TokenKind::Identifier: return "Identifier";
-    case parse::TokenKind::LeftParen: return "LeftParen";
-    case parse::TokenKind::RightParen: return "RightParen";
-    case parse::TokenKind::Minus: return "Minus";
-    case parse::TokenKind::Plus: return "Plus";
-    case parse::TokenKind::Star: return "Star";
-    case parse::TokenKind::Slash: return "Slash";
-    default: return "Unknown";
+    case parse::TokenKind::EndOfFile:
+        return "EOF";
+    case parse::TokenKind::FloatLiteral:
+        return "FloatLiteral";
+    case parse::TokenKind::IntLiteral:
+        return "IntLiteral";
+    case parse::TokenKind::StringLiteral:
+        return "StringLiteral";
+    case parse::TokenKind::Identifier:
+        return "Identifier";
+    case parse::TokenKind::LeftParen:
+        return "LeftParen";
+    case parse::TokenKind::RightParen:
+        return "RightParen";
+    case parse::TokenKind::Minus:
+        return "Minus";
+    case parse::TokenKind::Plus:
+        return "Plus";
+    case parse::TokenKind::Star:
+        return "Star";
+    case parse::TokenKind::Slash:
+        return "Slash";
+    default:
+        return "Unknown";
     }
 }
 

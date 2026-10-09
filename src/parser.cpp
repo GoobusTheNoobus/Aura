@@ -83,7 +83,10 @@ std::unique_ptr<BaseAST> Parser::parse_primary() {
     case parse::TokenKind::IntLiteral:
         // TODO: Use from_chars and report errors
         return std::make_unique<IntLiteral>(std::stoi(next().value));
-    case parse::TokenKind::Identifier: return std::make_unique<Identifier>(next().value);
+    case parse::TokenKind::StringLiteral:
+        return std::make_unique<StringLiteral>(next().value);
+    case parse::TokenKind::Identifier:
+        return std::make_unique<Identifier>(next().value);
     case parse::TokenKind::LeftParen: {
         next();
         auto expr = parse_expression();

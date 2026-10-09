@@ -25,8 +25,7 @@
 namespace parse {
 
 struct Parser {
-    Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {
-    }
+    Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {}
 
     [[nodiscard]] Program parse();
 

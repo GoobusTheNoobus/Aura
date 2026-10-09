@@ -35,6 +35,7 @@ enum class TokenKind {
 
     IntLiteral,
     FloatLiteral,
+    StringLiteral,
 
     Plus,
     Minus,

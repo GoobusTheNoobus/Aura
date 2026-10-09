@@ -82,7 +82,8 @@ std::vector<Token> Lexer::tokenize() {
             next();
             continue;
 
-        default: break;
+        default:
+            break;
         }
 
         // Next, we check if it is a number literal
@@ -94,6 +95,12 @@ std::vector<Token> Lexer::tokenize() {
         // Next, we check if we are dealing with a word/identifier
         if (std::isalnum(static_cast<unsigned char>(current)) || current == '_') {
             tokenize_word(tokens);
+            continue;
+        }
+
+        // Then, we check if we are dealing with a string
+        if (current == '\'' || current == '\"') {
+            tokenize_string(tokens);
             continue;
         }
 
@@ -149,6 +156,71 @@ void Lexer::tokenize_word(std::vector<Token>& tokens) {
     // Currently, we only handle identifiers, since no keywords have been added
     // yet
     tokens.push_back({value, TokenKind::Identifier});
+}
+
+void Lexer::tokenize_string(std::vector<Token>& tokens) {
+    std::string value;
+
+    // A string starting with a certain kind of quote must end with that quote too
+    char starting_quote = next();
+
+    while (!end() && peek() != starting_quote && peek() != '\n') {
+        char current = next();
+
+        // Escape character backslash
+        if (current == '\\') {
+            if (end() || peek() == '\n') {
+                report_error(ErrorKind::Parsing, "Unterminated escape sequence");
+                return;
+            }
+
+            // This represents the character after the backslash
+            char escape = next();
+
+            switch (escape) {
+            // Double backslash results in a single backslash being parsed
+            case '\\':
+                escape = '\\';
+                break;
+
+            // Both single and double quote escape characters get parsed as that quote type
+            case '\'':
+                escape = '\'';
+                break;
+            case '\"':
+                escape = '\"';
+                break;
+
+            // New line
+            case 'n':
+                escape = '\n';
+                break;
+
+            // Tab
+            case 't':
+                escape = '\t';
+                break;
+
+            // Unknown
+            default:
+                report_error(ErrorKind::Parsing, "Unknown escape sequence '\\{}'", escape);
+            }
+
+            value.push_back(escape);
+            continue;
+        }
+
+        // Normal character
+        value.push_back(current);
+    }
+
+    if (peek() == starting_quote) {
+        next();
+    } else {
+        report_error(ErrorKind::Parsing, "Unterminated string literal");
+    }
+
+    tokens.push_back({value, TokenKind::StringLiteral});
 }
 
 bool Lexer::end() const {

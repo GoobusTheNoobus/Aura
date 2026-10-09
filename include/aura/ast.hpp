@@ -41,6 +41,7 @@ enum class ASTKind {
     Identifier,
     IntLiteral,
     FloatLiteral,
+    StringLiteral,
 
     BinaryOperation,
 
@@ -49,8 +50,7 @@ enum class ASTKind {
 
 struct BaseAST {
     ASTKind kind;
-    BaseAST(ASTKind kind) : kind(kind) {
-    }
+    BaseAST(ASTKind kind) : kind(kind) {}
     virtual ~BaseAST() = default;
     virtual void print(std::ostream& out, i32 indent) const {
         out << std::string(indent, ' ') << "BaseAST\n";
@@ -61,8 +61,7 @@ struct Program : BaseAST {
     // we use std::unique_ptr BaseAST for ambiguous nodes
     std::vector<std::unique_ptr<BaseAST>> children;
 
-    Program() : BaseAST(ASTKind::Program) {
-    }
+    Program() : BaseAST(ASTKind::Program) {}
     void print(std::ostream& out, i32 indent) const override {
         for (auto& node : children) {
             node->print(out, indent);
@@ -73,8 +72,7 @@ struct Program : BaseAST {
 // Represents a variable
 struct Identifier : BaseAST {
     std::string name;
-    Identifier(std::string name) : BaseAST(ASTKind::Identifier), name(std::move(name)) {
-    }
+    Identifier(std::string name) : BaseAST(ASTKind::Identifier), name(std::move(name)) {}
     void print(std::ostream& out, i32 indent) const override {
         out << std::string(indent, ' ') << "Identifier('" << name << "')\n";
     }
@@ -84,8 +82,7 @@ struct Identifier : BaseAST {
 struct IntLiteral : BaseAST {
     i32 value;
 
-    IntLiteral(i32 value) : BaseAST(ASTKind::IntLiteral), value(value) {
-    }
+    IntLiteral(i32 value) : BaseAST(ASTKind::IntLiteral), value(value) {}
     void print(std::ostream& out, i32 indent) const override {
         out << std::string(indent, ' ') << "IntLiteral(" << value << ")\n";
     }
@@ -95,10 +92,19 @@ struct IntLiteral : BaseAST {
 struct FloatLiteral : BaseAST {
     f64 value;
 
-    FloatLiteral(f64 value) : BaseAST(ASTKind::FloatLiteral), value(value) {
-    }
+    FloatLiteral(f64 value) : BaseAST(ASTKind::FloatLiteral), value(value) {}
     void print(std::ostream& out, i32 indent) const override {
         out << std::string(indent, ' ') << "FloatLiteral(" << value << ")\n";
+    }
+};
+
+// Represents a raw string literal
+struct StringLiteral : BaseAST {
+    std::string value;
+
+    StringLiteral(std::string value) : BaseAST(ASTKind::StringLiteral), value(std::move(value)) {}
+    void print(std::ostream& out, i32 indent) const override {
+        out << std::string(indent, ' ') << "StringLiteral(" << value << ")\n";
     }
 };
 
@@ -108,8 +114,7 @@ struct BinaryOperation : BaseAST {
 
     BinaryOperation(std::unique_ptr<BaseAST> left, std::unique_ptr<BaseAST> right, TokenKind op)
         : BaseAST(ASTKind::BinaryOperation), left(std::move(left)), right(std::move(right)),
-          op(op) {
-    }
+          op(op) {}
     void print(std::ostream& out, i32 indent) const override {
         out << std::string(indent, ' ') << "BinaryOperation(" << token_kind_to_string(op) << ")\n";
         left->print(out, indent + 2);
@@ -120,8 +125,7 @@ struct BinaryOperation : BaseAST {
 // Represents an error in parsing. It gives something to return instead of return just nullptr,
 // which is highly unsafe in a language like C++
 struct ErrorNode : BaseAST {
-    ErrorNode() : BaseAST(ASTKind::Error) {
-    }
+    ErrorNode() : BaseAST(ASTKind::Error) {}
     void print(std::ostream& out, i32 indent) const override {
         out << std::string(indent, ' ') << "ErrorNode\n";
     }

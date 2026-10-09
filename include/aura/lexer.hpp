@@ -29,8 +29,7 @@ namespace parse {
 
 struct Lexer {
 
-    Lexer(std::string source) : source(std::move(source)) {
-    }
+    Lexer(std::string source) : source(std::move(source)) {}
 
     [[nodiscard]] std::vector<Token> tokenize();
 
@@ -50,6 +49,9 @@ struct Lexer {
 
     // Tokenizes when encountering a letter or underscore
     void tokenize_word(std::vector<Token>& tokens);
+
+    // Tokenizes when encountering double quote
+    void tokenize_string(std::vector<Token>& tokens);
 
     // Checks if our cursor is at the end of the source code
     bool end() const;

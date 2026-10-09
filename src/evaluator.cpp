@@ -45,8 +45,12 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
         report_error(ErrorKind::Semantic, "Unknown variable '{}'",
                      static_cast<parse::Identifier&>(*node).name);
         return Value();
-    case parse::ASTKind::FloatLiteral: return Value(static_cast<parse::FloatLiteral&>(*node).value);
-    case parse::ASTKind::IntLiteral: return Value(static_cast<parse::IntLiteral&>(*node).value);
+    case parse::ASTKind::FloatLiteral:
+        return Value(static_cast<parse::FloatLiteral&>(*node).value);
+    case parse::ASTKind::IntLiteral:
+        return Value(static_cast<parse::IntLiteral&>(*node).value);
+    case parse::ASTKind::StringLiteral:
+        return Value(static_cast<parse::StringLiteral&>(*node).value);
     case parse::ASTKind::BinaryOperation: {
         auto& binary = static_cast<parse::BinaryOperation&>(*node);
 
@@ -65,8 +69,9 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
         const i32* right_int = right.get_if<i32>();
         const f64* right_float = right.get_if<f64>();
 
-        if ((!left_int && !left_float && !(binary.op == parse::TokenKind::Plus && left_string)) ||
-            (!right_int && !right_float)) {
+        // We resolve types right now so we don't need to worry later
+        if (((!left_int && !left_float) || (!right_int && !right_float)) &&
+            !(binary.op == parse::TokenKind::Plus && left_string)) {
             report_error(ErrorKind::Runtime, "Invalid operands for operator '{}'",
                          parse::token_kind_to_string(binary.op));
             return Value();
@@ -105,6 +110,8 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
                 return Value(static_cast<i32>(left_value * right_value));
 
             case parse::TokenKind::Slash:
+                // Slash is different: division always results in floating point
+                // Also division by 0 is an edge case we need to handle and report properly
                 if (right_value == 0.0) {
                     report_error(ErrorKind::Runtime, "Cannot divide by zero");
                     return {};
