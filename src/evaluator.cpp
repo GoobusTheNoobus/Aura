@@ -82,7 +82,7 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
                 f64 left_value = left_float ? *left_float : static_cast<f64>(*left_int);
                 f64 right_value = right_float ? *right_float : static_cast<f64>(*right_int);
 
-                return do_operation<f64>(binary.op, left_value, right_value);
+                return do_numeric_operation<f64>(binary.op, left_value, right_value);
             }
 
             else {
@@ -90,7 +90,7 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
                 i32 left_value = *left_int;
                 i32 right_value = *right_int;
 
-                return do_operation<i32>(binary.op, left_value, right_value);
+                return do_numeric_operation<i32>(binary.op, left_value, right_value);
             }
 
         } else {
@@ -127,8 +127,10 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
     }
 }
 
-template <typename Type> Value Evaluator::do_operation(parse::TokenKind op, Type left, Type right) {
+template <typename Type>
+Value Evaluator::do_numeric_operation(parse::TokenKind op, Type left, Type right) {
     switch (op) {
+        // The following operators work on both ints and floats
     case parse::TokenKind::Plus:
         return Value(left + right);
 
@@ -138,16 +140,19 @@ template <typename Type> Value Evaluator::do_operation(parse::TokenKind op, Type
     case parse::TokenKind::Star:
         return Value(left * right);
 
+    // This only works with floats, since there are no integer divisions. Conversion to f64 is
+    // needed
     case parse::TokenKind::Slash:
-        if (right == 0) {
-            report_error(ErrorKind::Runtime, "Cannot divide by zero");
-            return Value();
-        }
+        if constexpr (std::is_same_v<Type, f64>) {
+            if (right == 0) {
+                report_error(ErrorKind::Runtime, "Cannot divide by zero");
+                return Value();
+            }
 
-        if constexpr (std::is_same_v<Type, i32>) {
-            return Value(static_cast<f64>(left) / right);
-        } else {
             return Value(left / right);
+        } else {
+            throw std::runtime_error("Template: Division requires floating point operands");
+            return Value();
         }
 
     case parse::TokenKind::Percent:

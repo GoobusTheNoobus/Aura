@@ -22,7 +22,6 @@
 #include "aura/token.hpp"
 #include "value.hpp"
 #include <memory>
-#include <vector>
 
 namespace interpreter {
 
@@ -33,7 +32,8 @@ struct Evaluator {
     private:
     // Performs an operation based on types. For example, the % operator only works when both
     // operands are int
-    template <typename Type> Value do_operation(parse::TokenKind kind, Type left, Type right);
+    template <typename Type>
+    Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);
 };
 
 } // namespace interpreter
