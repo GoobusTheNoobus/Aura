@@ -27,9 +27,6 @@ namespace interpreter {
 
 // Used to evaluate some expression that evaluates to some value
 struct Evaluator {
-    std::vector<Value> evaluate(parse::Program& program);
-
-    private:
     Value evaluate(std::unique_ptr<parse::BaseAST>& node);
 };
 

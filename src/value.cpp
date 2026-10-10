@@ -37,6 +37,15 @@ std::string Value::to_string() const {
     return "UNKNOWN";
 }
 
+std::string Value::get_type() const {
+
+    if (!valid)
+        return "<error-type>";
+
+    constexpr const char* Map[]{"<int>", "<float>", "<string>"};
+    return Map[data.index()];
+}
+
 std::ostream& operator<<(std::ostream& out, const Value& value) {
     out << value.to_string();
     return out;

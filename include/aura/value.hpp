@@ -45,6 +45,8 @@ struct Value {
     // Constructs a string
     Value(std::string data) : valid(true), data(std::move(data)) {}
 
+    std::string get_type() const;
+
     // Returns a const pointer to the value of the provided type if our data is meant to store that
     // type, otherwise a nullptr.
     template <typename Type> const Type* get_if() const {

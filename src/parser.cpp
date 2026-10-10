@@ -70,7 +70,8 @@ std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
     auto left = parse_primary();
 
     // We loop until we can't see the operator that we are trying to parse.
-    while (!end() && (peek().kind == TokenKind::Star || peek().kind == TokenKind::Slash)) {
+    while (!end() && (peek().kind == TokenKind::Star || peek().kind == TokenKind::Slash ||
+                      peek().kind == TokenKind::Percent)) {
         TokenKind op = next().kind;
 
         // After parsing the right hand side, we create a binary op storing both the left and the

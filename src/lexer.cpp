@@ -88,6 +88,10 @@ std::vector<Token> Lexer::tokenize() {
             tokens.push_back({"/", TokenKind::Slash});
             next();
             continue;
+        case '%':
+            tokens.push_back({"%", TokenKind::Percent});
+            next();
+            continue;
 
         default:
             break;

@@ -47,6 +47,8 @@ target_sources(aura PRIVATE
     src/token.cpp
     src/lexer.cpp
     src/parser.cpp
+    src/evaluator.cpp
+    src/value.cpp
 
     include/aura/token.hpp
     include/aura/lexer.hpp
@@ -56,6 +58,5 @@ target_sources(aura PRIVATE
     include/aura/diagnostic.hpp
     include/aura/evaluator.hpp
     include/aura/value.hpp
-    src/evaluator.cpp
-    src/value.cpp
+    
 )

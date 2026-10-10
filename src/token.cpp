@@ -48,6 +48,8 @@ std::string token_kind_to_string(TokenKind kind) {
         return "Star";
     case parse::TokenKind::Slash:
         return "Slash";
+    case parse::TokenKind::Percent:
+        return "Percent";
     default:
         return "Unknown";
     }

@@ -24,20 +24,8 @@
 #include "aura/value.hpp"
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 namespace interpreter {
-
-std::vector<Value> Evaluator::evaluate(parse::Program& program) {
-    // We could have multiple values in a REPL shell
-    std::vector<Value> values;
-
-    for (auto& node : program.children) {
-        values.push_back(evaluate(node));
-    }
-
-    return values;
-}
 
 Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
     switch (node->kind) {
@@ -68,74 +56,129 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
         const std::string* left_string = left.get_if<std::string>();
         const i32* right_int = right.get_if<i32>();
         const f64* right_float = right.get_if<f64>();
+        const std::string* right_string = right.get_if<std::string>();
 
         // We resolve types right now so we don't need to worry later
-        if (((!left_int && !left_float) || (!right_int && !right_float)) &&
-            !(binary.op == parse::TokenKind::Plus && left_string)) {
-            report_error(ErrorKind::Runtime, "Invalid operands for operator '{}'",
-                         parse::token_kind_to_string(binary.op));
+        bool is_string_concat =
+            binary.op == parse::TokenKind::Plus && (left_string || right_string);
+
+        bool operands_are_numeric = (left_int || left_float) && (right_int || right_float);
+        bool is_invalid_modu = binary.op == parse::TokenKind::Percent && !(left_int && right_int);
+
+        if ((!operands_are_numeric && !is_string_concat) || is_invalid_modu) {
+            report_error(ErrorKind::Semantic, "Invalid operand types {} and {} for operator '{}'",
+                         left.get_type(), right.get_type(), parse::token_kind_to_string(binary.op));
             return Value();
         }
 
         // Numeric operations operate differently from string concat
-        bool result_is_numeric = !left_string;
+        bool result_is_numeric = !left_string && !right_string;
 
         if (result_is_numeric) {
             bool result_is_float =
                 (left_float || right_float || binary.op == parse::TokenKind::Slash);
 
-            // We use floats since they can essentially represent most numbers nicely
-            f64 left_value = left_float ? *left_float : static_cast<f64>(*left_int);
-            f64 right_value = right_float ? *right_float : static_cast<f64>(*right_int);
+            if (result_is_float) {
+                f64 left_value = left_float ? *left_float : static_cast<f64>(*left_int);
+                f64 right_value = right_float ? *right_float : static_cast<f64>(*right_int);
 
-            switch (binary.op) {
-            case parse::TokenKind::Plus:
+                switch (binary.op) {
+                case parse::TokenKind::Plus:
 
-                if (result_is_float) {
-                    return Value(left_value + right_value);
+                    if (result_is_float) {
+                        return Value(left_value + right_value);
+                    }
+                    return Value(static_cast<i32>(left_value + right_value));
+
+                case parse::TokenKind::Minus:
+
+                    if (result_is_float) {
+                        return Value{left_value - right_value};
+                    }
+                    return Value(static_cast<i32>(left_value - right_value));
+
+                case parse::TokenKind::Star:
+                    if (result_is_float) {
+                        return Value{left_value * right_value};
+                    }
+                    return Value(static_cast<i32>(left_value * right_value));
+
+                case parse::TokenKind::Slash:
+                    // Slash is different: division always results in floating point
+                    // Also division by 0 is an edge case we need to handle and report properly
+                    if (right_value == 0.0) {
+                        report_error(ErrorKind::Runtime, "Cannot divide by zero");
+                        return Value();
+                    }
+
+                    return Value(left_value / right_value);
+
+                default:
+                    throw std::runtime_error("Unknown operation type '" +
+                                             parse::token_kind_to_string(binary.op) + "'");
                 }
-                return Value(static_cast<i32>(left_value + right_value));
-
-            case parse::TokenKind::Minus:
-
-                if (result_is_float) {
-                    return Value{left_value - right_value};
-                }
-                return Value(static_cast<i32>(left_value - right_value));
-
-            case parse::TokenKind::Star:
-                if (result_is_float) {
-                    return Value{left_value * right_value};
-                }
-                return Value(static_cast<i32>(left_value * right_value));
-
-            case parse::TokenKind::Slash:
-                // Slash is different: division always results in floating point
-                // Also division by 0 is an edge case we need to handle and report properly
-                if (right_value == 0.0) {
-                    report_error(ErrorKind::Runtime, "Cannot divide by zero");
-                    return {};
-                }
-
-                return Value(left_value / right_value);
-
-            default:
-                throw std::runtime_error("Unknown operation type '" +
-                                         parse::token_kind_to_string(binary.op) + "'");
             }
+
+            else {
+
+                i32 left_value = *left_int;
+                i32 right_value = *right_int;
+
+                switch (binary.op) {
+                case parse::TokenKind::Plus:
+
+                    if (result_is_float) {
+                        return Value(left_value + right_value);
+                    }
+                    return Value(static_cast<i32>(left_value + right_value));
+
+                case parse::TokenKind::Minus:
+
+                    if (result_is_float) {
+                        return Value{left_value - right_value};
+                    }
+                    return Value(static_cast<i32>(left_value - right_value));
+
+                case parse::TokenKind::Percent:
+                    // Percent (remainder) is also pretty similar to division, as it is just the
+                    // remainder of the division process
+                    if (right_value == 0.0) {
+                        report_error(ErrorKind::Runtime, "Cannot divide by zero");
+                        return Value();
+                    }
+
+                    return Value(static_cast<i32>(left_value) % static_cast<i32>(right_value));
+
+                default:
+                    throw std::runtime_error("Unknown operation type '" +
+                                             parse::token_kind_to_string(binary.op) + "'");
+                }
+            }
+
         } else {
             // String concatenation
             // We already checked the sign up there somewhere (scroll up)
 
             // Now we need to see what the right type is, since a string can be concatenated with
             // multiple types
-            if (const i32* data = right.get_if<i32>())
-                return Value(*left_string + std::to_string(*data));
-            else if (const f64* data = right.get_if<f64>())
-                return Value(*left_string + std::to_string(*data));
+
+            std::string left_str_converted;
+            if (const i32* data = left.get_if<i32>())
+                left_str_converted = std::to_string(*data);
+            else if (const f64* data = left.get_if<f64>())
+                left_str_converted = std::to_string(*data);
             else
-                // Dangerous, I know
-                return Value(*left_string + *right.get_if<std::string>());
+                left_str_converted = *left.get_if<std::string>();
+
+            std::string right_str_converted;
+            if (const i32* data = right.get_if<i32>())
+                right_str_converted = std::to_string(*data);
+            else if (const f64* data = right.get_if<f64>())
+                right_str_converted = std::to_string(*data);
+            else
+                right_str_converted = *right.get_if<std::string>();
+
+            return Value(left_str_converted + right_str_converted);
         }
     }
 

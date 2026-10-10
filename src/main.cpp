@@ -72,13 +72,12 @@ int main() {
         }
 
         Evaluator evaluator;
-        auto values = evaluator.evaluate(program);
+        for (auto& node : program.children) {
+            Value value = evaluator.evaluate(node);
+            if (error_encountered) {
+                continue;
+            }
 
-        if (error_encountered) {
-            continue;
-        }
-
-        for (const Value& value : values) {
             std::cout << value << std::endl;
         }
     }
