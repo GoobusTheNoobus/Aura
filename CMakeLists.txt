@@ -59,4 +59,3 @@ target_sources(aura PRIVATE
     src/evaluator.cpp
     src/value.cpp
 )
-

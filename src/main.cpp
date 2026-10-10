@@ -19,6 +19,7 @@
 
 #include "aura/diagnostic.hpp"
 #include "aura/evaluator.hpp"
+#include <vector>
 #define VERSION "0.1.0"
 
 #include "aura/lexer.hpp"
@@ -58,7 +59,12 @@ int main() {
         }
 
         Lexer lexer(input);
-        Parser parser(lexer.tokenize());
+        std::vector<Token> tokens = lexer.tokenize();
+        if (error_encountered) {
+            continue;
+        }
+
+        Parser parser(tokens);
         Program program = parser.parse();
 
         if (error_encountered) {

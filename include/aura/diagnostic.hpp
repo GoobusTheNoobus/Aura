@@ -36,7 +36,7 @@ void report_error(ErrorKind kind, std::format_string<Args...> format, Args... ar
     std::cerr << ansi::Red;
     switch (kind) {
     case ErrorKind::Parsing:
-        std::cerr << "ParsingError: ";
+        std::cerr << "ParserError: ";
         break;
     case ErrorKind::Runtime:
         std::cerr << "RuntimeError: ";
