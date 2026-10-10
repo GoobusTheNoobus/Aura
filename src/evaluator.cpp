@@ -82,41 +82,7 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
                 f64 left_value = left_float ? *left_float : static_cast<f64>(*left_int);
                 f64 right_value = right_float ? *right_float : static_cast<f64>(*right_int);
 
-                switch (binary.op) {
-                case parse::TokenKind::Plus:
-
-                    if (result_is_float) {
-                        return Value(left_value + right_value);
-                    }
-                    return Value(static_cast<i32>(left_value + right_value));
-
-                case parse::TokenKind::Minus:
-
-                    if (result_is_float) {
-                        return Value{left_value - right_value};
-                    }
-                    return Value(static_cast<i32>(left_value - right_value));
-
-                case parse::TokenKind::Star:
-                    if (result_is_float) {
-                        return Value{left_value * right_value};
-                    }
-                    return Value(static_cast<i32>(left_value * right_value));
-
-                case parse::TokenKind::Slash:
-                    // Slash is different: division always results in floating point
-                    // Also division by 0 is an edge case we need to handle and report properly
-                    if (right_value == 0.0) {
-                        report_error(ErrorKind::Runtime, "Cannot divide by zero");
-                        return Value();
-                    }
-
-                    return Value(left_value / right_value);
-
-                default:
-                    throw std::runtime_error("Unknown operation type '" +
-                                             parse::token_kind_to_string(binary.op) + "'");
-                }
+                return do_operation<f64>(binary.op, left_value, right_value);
             }
 
             else {
@@ -124,35 +90,7 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
                 i32 left_value = *left_int;
                 i32 right_value = *right_int;
 
-                switch (binary.op) {
-                case parse::TokenKind::Plus:
-
-                    if (result_is_float) {
-                        return Value(left_value + right_value);
-                    }
-                    return Value(static_cast<i32>(left_value + right_value));
-
-                case parse::TokenKind::Minus:
-
-                    if (result_is_float) {
-                        return Value{left_value - right_value};
-                    }
-                    return Value(static_cast<i32>(left_value - right_value));
-
-                case parse::TokenKind::Percent:
-                    // Percent (remainder) is also pretty similar to division, as it is just the
-                    // remainder of the division process
-                    if (right_value == 0.0) {
-                        report_error(ErrorKind::Runtime, "Cannot divide by zero");
-                        return Value();
-                    }
-
-                    return Value(static_cast<i32>(left_value) % static_cast<i32>(right_value));
-
-                default:
-                    throw std::runtime_error("Unknown operation type '" +
-                                             parse::token_kind_to_string(binary.op) + "'");
-                }
+                return do_operation<i32>(binary.op, left_value, right_value);
             }
 
         } else {
@@ -186,6 +124,47 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
         throw std::runtime_error("Unknown node kind id=" +
                                  std::to_string(static_cast<i32>(node->kind)));
     }
+    }
+}
+
+template <typename Type> Value Evaluator::do_operation(parse::TokenKind op, Type left, Type right) {
+    switch (op) {
+    case parse::TokenKind::Plus:
+        return Value(left + right);
+
+    case parse::TokenKind::Minus:
+        return Value(left - right);
+
+    case parse::TokenKind::Star:
+        return Value(left * right);
+
+    case parse::TokenKind::Slash:
+        if (right == 0) {
+            report_error(ErrorKind::Runtime, "Cannot divide by zero");
+            return Value();
+        }
+
+        if constexpr (std::is_same_v<Type, i32>) {
+            return Value(static_cast<f64>(left) / right);
+        } else {
+            return Value(left / right);
+        }
+
+    case parse::TokenKind::Percent:
+        if constexpr (std::is_same_v<Type, i32>) {
+            if (right == 0) {
+                report_error(ErrorKind::Runtime, "Cannot divide by zero");
+                return Value();
+            }
+
+            return Value(left % right);
+        } else {
+            report_error(ErrorKind::Runtime, "Remainder requires integer operands");
+            return Value();
+        }
+
+    default:
+        throw std::runtime_error("Unknown arithmetic operation");
     }
 }
 
