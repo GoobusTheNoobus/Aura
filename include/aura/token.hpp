@@ -37,6 +37,7 @@ enum class TokenKind {
     IntLiteral,
     FloatLiteral,
     StringLiteral,
+    BooleanLiteral,
 
     // TODO: Add BoolLiteral and impl related stuff
 
@@ -53,6 +54,9 @@ enum class TokenKind {
     LessEqualThan,
     GreaterEqualThan,
 
+    LogicalAnd,
+    LogicalOr,
+
     LeftParen,
     RightParen,
 };
@@ -64,6 +68,7 @@ struct Token {
     TokenKind kind;
 };
 
+// Printing/Reporting functions
 std::string token_kind_to_string(TokenKind kind);
 std::ostream& operator<<(std::ostream& out, const Token& token);
 std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens);

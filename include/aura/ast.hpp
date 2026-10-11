@@ -42,6 +42,7 @@ enum class ASTKind {
     IntLiteral,
     FloatLiteral,
     StringLiteral,
+    BooleanLiteral,
 
     BinaryOperation,
 
@@ -108,6 +109,17 @@ struct StringLiteral : BaseAST {
     }
 };
 
+// Represents a true/false value
+struct BooleanLiteral : BaseAST {
+    bool value;
+
+    BooleanLiteral(bool value) : BaseAST(ASTKind::BooleanLiteral), value(value) {}
+    void print(std::ostream& out, i32 indent) const override {
+        out << std::string(indent, ' ') << "BooleanLiteral(" << (value ? "true" : "false") << ")\n";
+    }
+};
+
+// Represents an operation with 2 operands.
 struct BinaryOperation : BaseAST {
     std::unique_ptr<BaseAST> left, right;
     TokenKind op;

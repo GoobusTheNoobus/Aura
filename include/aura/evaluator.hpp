@@ -30,13 +30,16 @@ struct Evaluator {
     Value evaluate(std::unique_ptr<parse::BaseAST>& node);
 
     private:
+    Value evaluate_binary(parse::BinaryOperation& node);
+
     // Performs an operation based on types. For example, the % operator only works when both
     // operands are int
     template <typename Type>
     Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);
 
+    // Performs a boolean comparison
     template <typename Type>
-    Value do_comparison_operation(parse::TokenKind kind, Type value1, Type value2);
+    Value do_comparison_operation(parse::TokenKind kind, Type left, Type right);
 };
 
 } // namespace interpreter

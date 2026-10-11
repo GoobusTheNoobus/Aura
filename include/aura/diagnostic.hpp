@@ -31,6 +31,7 @@ enum class ErrorKind {
     Semantic,
 };
 
+// Raises an error, uses a format string for easy formatting
 template <typename... Args>
 void report_error(ErrorKind kind, std::format_string<Args...> format, Args... args) {
     std::cerr << ansi::Red;

@@ -150,6 +150,30 @@ std::vector<Token> Lexer::tokenize() {
 
             break;
 
+        case '|':
+            // || for logical or
+            if (peek(1) == '|') {
+                tokens.push_back({"||", TokenKind::LogicalOr});
+                next();
+                next();
+                continue;
+            }
+
+            // We don't have single ! yet, so we fall through
+            break;
+
+        case '&':
+            // || for logical or
+            if (peek(1) == '&') {
+                tokens.push_back({"&&", TokenKind::LogicalAnd});
+                next();
+                next();
+                continue;
+            }
+
+            // We don't have single ! yet, so we fall through
+            break;
+
         default:
             break;
         }
@@ -221,8 +245,12 @@ void Lexer::tokenize_word(std::vector<Token>& tokens) {
         value.push_back(next());
     }
 
-    // Currently, we only handle identifiers, since no keywords have been added
-    // yet
+    // Boolean
+    if (value == "true" || value == "false") {
+        tokens.push_back({value, TokenKind::BooleanLiteral});
+        return;
+    }
+
     tokens.push_back({value, TokenKind::Identifier});
 }
 

@@ -42,6 +42,12 @@ struct Parser {
 
     // The following functions are sorted from lowest precedence to highest
 
+    // Logical Or
+    std::unique_ptr<BaseAST> parse_logical_or();
+
+    // Logical And
+    std::unique_ptr<BaseAST> parse_logical_and();
+
     // Equal/Not Equal
     std::unique_ptr<BaseAST> parse_equality();
 

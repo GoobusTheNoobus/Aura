@@ -34,6 +34,8 @@ std::string token_kind_to_string(TokenKind kind) {
         return "IntLiteral";
     case parse::TokenKind::StringLiteral:
         return "StringLiteral";
+    case parse::TokenKind::BooleanLiteral:
+        return "BooleanLiteral";
     case parse::TokenKind::Identifier:
         return "Identifier";
     case parse::TokenKind::LeftParen:
@@ -62,6 +64,10 @@ std::string token_kind_to_string(TokenKind kind) {
         return "LessEqualThan";
     case parse::TokenKind::GreaterEqualThan:
         return "GreaterEqualThan";
+    case parse::TokenKind::LogicalAnd:
+        return "LogicalAnd";
+    case parse::TokenKind::LogicalOr:
+        return "LogicalOr";
     default:
         return "Unknown";
     }

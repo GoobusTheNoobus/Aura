@@ -45,7 +45,41 @@ Program Parser::parse() {
 
 std::unique_ptr<BaseAST> Parser::parse_expression() {
     // Just a wrapper function around the lowest precedence parsing helper
-    return parse_equality();
+    return parse_logical_or();
+}
+
+std::unique_ptr<BaseAST> Parser::parse_logical_or() {
+    // we parse the left side
+    auto left = parse_logical_and();
+
+    // We loop until we can't see the operator that we are trying to parse.
+    while (!end() && (peek().kind == TokenKind::LogicalOr)) {
+        TokenKind op = next().kind;
+
+        // After parsing the right hand side, we create a binary op storing both the left and the
+        // right side before storing the entire operation in the left side
+        auto right = parse_logical_and();
+        left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
+    }
+
+    return left;
+}
+
+std::unique_ptr<BaseAST> Parser::parse_logical_and() {
+    // we parse the left side
+    auto left = parse_equality();
+
+    // We loop until we can't see the operator that we are trying to parse.
+    while (!end() && (peek().kind == TokenKind::LogicalAnd)) {
+        TokenKind op = next().kind;
+
+        // After parsing the right hand side, we create a binary op storing both the left and the
+        // right side before storing the entire operation in the left side
+        auto right = parse_equality();
+        left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
+    }
+
+    return left;
 }
 
 std::unique_ptr<BaseAST> Parser::parse_equality() {
@@ -129,6 +163,8 @@ std::unique_ptr<BaseAST> Parser::parse_primary() {
         return std::make_unique<IntLiteral>(std::stoi(next().value));
     case parse::TokenKind::StringLiteral:
         return std::make_unique<StringLiteral>(next().value);
+    case parse::TokenKind::BooleanLiteral:
+        return std::make_unique<BooleanLiteral>(next().value == "true" ? true : false);
     case parse::TokenKind::Identifier:
         return std::make_unique<Identifier>(next().value);
     case parse::TokenKind::LeftParen: {

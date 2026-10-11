@@ -68,6 +68,7 @@ int main() {
         Program program = parser.parse();
 
         if (error_encountered) {
+            program.print(std::cout, 0);
             continue;
         }
 
