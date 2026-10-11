@@ -42,8 +42,7 @@ target_link_options(aura PRIVATE
     >
 )
 
-target_sources(aura PRIVATE 
-    src/main.cpp
+set(AURA_SOURCES
     src/token.cpp
     src/lexer.cpp
     src/parser.cpp
@@ -58,5 +57,20 @@ target_sources(aura PRIVATE
     include/aura/diagnostic.hpp
     include/aura/evaluator.hpp
     include/aura/value.hpp
-    
 )
+
+target_sources(aura PRIVATE 
+    src/main.cpp
+    ${AURA_SOURCES}
+)
+
+# Testing
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_executable(aura_test)
+
+    target_sources(aura_test PRIVATE 
+        tests/test.cpp
+        ${AURA_SOURCES}
+    )
+    target_include_directories(aura_test PRIVATE include)
+endif()

@@ -74,24 +74,18 @@ std::string token_kind_to_string(TokenKind kind) {
 }
 
 std::ostream& operator<<(std::ostream& out, const Token& token) {
-    out << "{ 'kind': '" << token_kind_to_string(token.kind) << "', 'value': '" << token.value
-        << "' }";
+    out << token_kind_to_string(token.kind) << "('" << token.value << "')";
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens) {
-    out << "[\n";
 
     for (const Token& token : tokens) {
-        out << "  " << token;
-        if (&token != &tokens.back()) {
-            out << ',';
-        }
-
+        out << token;
         out << '\n';
     }
 
-    return out << "]";
+    return out;
 }
 
 bool is_comparison(TokenKind kind) {
