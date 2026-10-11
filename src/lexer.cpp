@@ -92,6 +92,63 @@ std::vector<Token> Lexer::tokenize() {
             tokens.push_back({"%", TokenKind::Percent});
             next();
             continue;
+        case '=':
+
+            // Double equal signs representing comparison equal
+            if (peek(1) == '=') {
+                tokens.push_back({"==", TokenKind::EqualEqual});
+                next();
+                next();
+                continue;
+            }
+
+            // We don't have single equal yet, so we fall through
+            break;
+
+        case '!':
+
+            // Bang equal signs representing comparison not equal
+            if (peek(1) == '=') {
+                tokens.push_back({"!=", TokenKind::BangEqual});
+                next();
+                next();
+                continue;
+            }
+
+            // We don't have single ! yet, so we fall through
+            break;
+
+        case '>':
+
+            // >= for greater or equal than
+            if (peek(1) == '=') {
+                tokens.push_back({">=", TokenKind::GreaterEqualThan});
+                next();
+                next();
+                continue;
+            }
+
+            tokens.push_back({">", TokenKind::GreaterThan});
+            next();
+            continue;
+
+            break;
+
+        case '<':
+
+            // <= for less or equal than
+            if (peek(1) == '=') {
+                tokens.push_back({"<=", TokenKind::LessEqualThan});
+                next();
+                next();
+                continue;
+            }
+
+            tokens.push_back({"<", TokenKind::LessThan});
+            next();
+            continue;
+
+            break;
 
         default:
             break;

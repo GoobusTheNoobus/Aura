@@ -38,11 +38,20 @@ enum class TokenKind {
     FloatLiteral,
     StringLiteral,
 
+    // TODO: Add BoolLiteral and impl related stuff
+
     Plus,
     Minus,
     Star,
     Slash,
     Percent,
+
+    EqualEqual,
+    BangEqual,
+    LessThan,
+    GreaterThan,
+    LessEqualThan,
+    GreaterEqualThan,
 
     LeftParen,
     RightParen,
@@ -58,5 +67,7 @@ struct Token {
 std::string token_kind_to_string(TokenKind kind);
 std::ostream& operator<<(std::ostream& out, const Token& token);
 std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens);
+
+bool is_comparison(TokenKind kind);
 
 } // namespace parse

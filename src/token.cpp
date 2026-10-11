@@ -50,6 +50,18 @@ std::string token_kind_to_string(TokenKind kind) {
         return "Slash";
     case parse::TokenKind::Percent:
         return "Percent";
+    case parse::TokenKind::EqualEqual:
+        return "EqualEqual";
+    case parse::TokenKind::BangEqual:
+        return "BangEqual";
+    case parse::TokenKind::LessThan:
+        return "LessThan";
+    case parse::TokenKind::GreaterThan:
+        return "GreaterThan";
+    case parse::TokenKind::LessEqualThan:
+        return "LessEqualThan";
+    case parse::TokenKind::GreaterEqualThan:
+        return "GreaterEqualThan";
     default:
         return "Unknown";
     }
@@ -74,6 +86,12 @@ std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens) {
     }
 
     return out << "]";
+}
+
+bool is_comparison(TokenKind kind) {
+    return kind == TokenKind::EqualEqual || kind == TokenKind::BangEqual ||
+           kind == TokenKind::LessEqualThan || kind == TokenKind::LessThan ||
+           kind == TokenKind::GreaterThan || kind == TokenKind::GreaterEqualThan;
 }
 
 } // namespace parse

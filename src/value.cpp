@@ -32,6 +32,8 @@ std::string Value::to_string() const {
         return std::to_string(*data);
     else if (const std::string* data = get_if<std::string>())
         return *data;
+    else if (const bool* data = get_if<bool>())
+        return *data ? "true" : "false";
 
     // Probably an error value, and shouldn't print
     return "UNKNOWN";
@@ -42,7 +44,7 @@ std::string Value::get_type() const {
     if (!valid)
         return "<error-type>";
 
-    constexpr const char* Map[]{"<int>", "<float>", "<string>"};
+    constexpr const char* Map[]{"<int>", "<float>", "<string>", "<bool>"};
     return Map[data.index()];
 }
 

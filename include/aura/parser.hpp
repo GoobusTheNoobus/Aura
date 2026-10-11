@@ -42,6 +42,12 @@ struct Parser {
 
     // The following functions are sorted from lowest precedence to highest
 
+    // Equal/Not Equal
+    std::unique_ptr<BaseAST> parse_equality();
+
+    // More/Less/MoreEqual/LessEqual
+    std::unique_ptr<BaseAST> parse_relational();
+
     // Addition/Subtraction
     std::unique_ptr<BaseAST> parse_additive();
 

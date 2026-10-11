@@ -45,7 +45,44 @@ Program Parser::parse() {
 
 std::unique_ptr<BaseAST> Parser::parse_expression() {
     // Just a wrapper function around the lowest precedence parsing helper
-    return parse_additive();
+    return parse_equality();
+}
+
+std::unique_ptr<BaseAST> Parser::parse_equality() {
+    // we parse the left side
+    auto left = parse_relational();
+
+    // We loop until we can't see the operator that we are trying to parse.
+    while (!end() &&
+           (peek().kind == TokenKind::EqualEqual || peek().kind == TokenKind::BangEqual)) {
+        TokenKind op = next().kind;
+
+        // After parsing the right hand side, we create a binary op storing both the left and the
+        // right side before storing the entire operation in the left side
+        auto right = parse_relational();
+        left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
+    }
+
+    return left;
+}
+
+std::unique_ptr<BaseAST> Parser::parse_relational() {
+    // we parse the left side
+    auto left = parse_additive();
+
+    // We loop until we can't see the operator that we are trying to parse.
+    while (!end() &&
+           (peek().kind == TokenKind::LessThan || peek().kind == TokenKind::LessEqualThan ||
+            peek().kind == TokenKind::GreaterThan || peek().kind == TokenKind::GreaterEqualThan)) {
+        TokenKind op = next().kind;
+
+        // After parsing the right hand side, we create a binary op storing both the left and the
+        // right side before storing the entire operation in the left side
+        auto right = parse_additive();
+        left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
+    }
+
+    return left;
 }
 
 std::unique_ptr<BaseAST> Parser::parse_additive() {

@@ -34,6 +34,9 @@ struct Evaluator {
     // operands are int
     template <typename Type>
     Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);
+
+    template <typename Type>
+    Value do_comparison_operation(parse::TokenKind kind, Type value1, Type value2);
 };
 
 } // namespace interpreter

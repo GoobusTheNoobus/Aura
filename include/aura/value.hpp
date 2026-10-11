@@ -31,7 +31,7 @@ struct Value {
     // (random_invalid_expression)+1, random_invalid_expression would evaluate to an invalid value,
     // which proprogates to the root of the expression tree
     bool valid = false;
-    std::variant<i32, f64, std::string> data;
+    std::variant<i32, f64, std::string, bool> data;
 
     // Default constructor with no value represents an error value
     Value() = default;
@@ -44,6 +44,9 @@ struct Value {
 
     // Constructs a string
     Value(std::string data) : valid(true), data(std::move(data)) {}
+
+    // Constructs a boolean
+    Value(bool value) : valid(true), data(value) {}
 
     std::string get_type() const;
 
