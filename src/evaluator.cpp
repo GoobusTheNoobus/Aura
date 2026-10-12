@@ -47,6 +47,8 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
 
     case parse::ASTKind::BinaryOperation:
         return evaluate_binary(static_cast<parse::BinaryOperation&>(*node));
+    case parse::ASTKind::UnaryOperation:
+        return evaluate_unary(static_cast<parse::UnaryOperation&>(*node));
 
     default: {
         throw std::runtime_error("Unknown node kind id=" +
@@ -85,7 +87,7 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
     bool is_comparison = parse::is_comparison(node.op);
 
     bool is_equality_comparison =
-        node.op == parse::TokenKind::EqualEqual || node.op == parse::TokenKind::BangEqual;
+        node.op == parse::TokenKind::EqualEqual || node.op == parse::TokenKind::NotEqual;
 
     bool is_relational_comparison = is_comparison && !is_equality_comparison;
 
@@ -114,8 +116,8 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
     }
 
     if (invalid_operands) {
-        report_error(ErrorKind::Runtime, "Invalid operand types {} and {} for operator '{}'",
-                     left.get_type(), right.get_type(), parse::token_kind_to_string(node.op));
+        report_error(ErrorKind::Runtime, "Invalid operand types {} and {} for binary operator '{}'",
+                     left.get_type(), right.get_type(), parse::operator_to_string(node.op));
         return Value();
     }
 
@@ -134,7 +136,7 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
             const bool both_are_strings = left_string && right_string;
 
             if (!both_are_strings)
-                return Value(node.op == parse::TokenKind::BangEqual);
+                return Value(node.op == parse::TokenKind::NotEqual);
 
             return do_comparison_operation(node.op, *left_string, *right_string);
         }
@@ -222,7 +224,7 @@ Value Evaluator::do_comparison_operation(parse::TokenKind kind, Type left, Type 
     switch (kind) {
     case parse::TokenKind::EqualEqual:
         return Value(left == right);
-    case parse::TokenKind::BangEqual:
+    case parse::TokenKind::NotEqual:
         return Value(left != right);
     case parse::TokenKind::LessThan:
         return Value(left < right);
@@ -233,8 +235,59 @@ Value Evaluator::do_comparison_operation(parse::TokenKind kind, Type left, Type 
     case parse::TokenKind::GreaterEqualThan:
         return Value(left >= right);
     default:
-        throw std::runtime_error("Unknown comparison operator " +
-                                 parse::token_kind_to_string(kind));
+        throw std::runtime_error("Unknown comparison operator " + parse::operator_to_string(kind));
+    }
+}
+
+Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
+    switch (node.op) {
+    case parse::TokenKind::Plus:
+    case parse::TokenKind::Minus: {
+        Value value = evaluate(node.operand);
+
+        // Plus and Minus unarys only work for numeric types
+        if (!value.is_numeric()) {
+            report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
+                         value.get_type(), parse::operator_to_string(node.op));
+            return Value();
+        }
+
+        if (node.op == parse::TokenKind::Plus) {
+            return value;
+        }
+
+        // Minus
+        const i32* op_int = value.get_if<i32>();
+        const f64* op_float = value.get_if<f64>();
+
+        // We do - on whatever is inside value. However, since C++ is statically typed, we have to
+        // actually check which one we need to do. Shame on you, C++.
+
+        // We also cannot use ?: since the types get converted to each other based on some obscure
+        // C++ typing rules. Shame on you, C++.
+        if (op_int) {
+            return -*op_int;
+        }
+
+        return -*op_float;
+    }
+
+    case parse::TokenKind::LogicalNot: {
+        Value value = evaluate(node.operand);
+
+        const bool* op_bool = value.get_if<bool>();
+
+        if (!op_bool) {
+            report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
+                         value.get_type(), parse::operator_to_string(node.op));
+            return Value();
+        }
+
+        return !*op_bool;
+    }
+
+    default:
+        throw std::runtime_error("Unknown unary operation");
     }
 }
 

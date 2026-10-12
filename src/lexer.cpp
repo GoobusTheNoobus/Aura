@@ -109,13 +109,16 @@ std::vector<Token> Lexer::tokenize() {
 
             // Bang equal signs representing comparison not equal
             if (peek(1) == '=') {
-                tokens.push_back({"!=", TokenKind::BangEqual});
+                tokens.push_back({"!=", TokenKind::NotEqual});
                 next();
                 next();
                 continue;
             }
 
-            // We don't have single ! yet, so we fall through
+            tokens.push_back({"!", TokenKind::LogicalNot});
+            next();
+            continue;
+
             break;
 
         case '>':
@@ -159,11 +162,10 @@ std::vector<Token> Lexer::tokenize() {
                 continue;
             }
 
-            // We don't have single ! yet, so we fall through
             break;
 
         case '&':
-            // || for logical or
+            // && for logical and
             if (peek(1) == '&') {
                 tokens.push_back({"&&", TokenKind::LogicalAnd});
                 next();
@@ -171,7 +173,6 @@ std::vector<Token> Lexer::tokenize() {
                 continue;
             }
 
-            // We don't have single ! yet, so we fall through
             break;
 
         default:

@@ -87,8 +87,7 @@ std::unique_ptr<BaseAST> Parser::parse_equality() {
     auto left = parse_relational();
 
     // We loop until we can't see the operator that we are trying to parse.
-    while (!end() &&
-           (peek().kind == TokenKind::EqualEqual || peek().kind == TokenKind::BangEqual)) {
+    while (!end() && (peek().kind == TokenKind::EqualEqual || peek().kind == TokenKind::NotEqual)) {
         TokenKind op = next().kind;
 
         // After parsing the right hand side, we create a binary op storing both the left and the
@@ -138,7 +137,7 @@ std::unique_ptr<BaseAST> Parser::parse_additive() {
 
 std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
     // we parse the left side
-    auto left = parse_primary();
+    auto left = parse_unary();
 
     // We loop until we can't see the operator that we are trying to parse.
     while (!end() && (peek().kind == TokenKind::Star || peek().kind == TokenKind::Slash ||
@@ -147,11 +146,24 @@ std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
 
         // After parsing the right hand side, we create a binary op storing both the left and the
         // right side before storing the entire operation in the left side
-        auto right = parse_primary();
+        auto right = parse_unary();
         left = std::make_unique<BinaryOperation>(std::move(left), std::move(right), op);
     }
 
     return left;
+}
+
+std::unique_ptr<BaseAST> Parser::parse_unary() {
+    if (!end() && (peek().kind == TokenKind::Plus || peek().kind == TokenKind::Minus ||
+                   peek().kind == TokenKind::LogicalNot)) {
+        TokenKind op = next().kind;
+
+        // We recursively parse this function, that way, if we have +-+-3, it would parse all of it
+        // from right to left.
+        return std::make_unique<UnaryOperation>(parse_unary(), op);
+    }
+
+    return parse_primary();
 }
 
 std::unique_ptr<BaseAST> Parser::parse_primary() {

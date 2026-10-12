@@ -48,7 +48,7 @@ enum class TokenKind {
     Percent,
 
     EqualEqual,
-    BangEqual,
+    NotEqual,
     LessThan,
     GreaterThan,
     LessEqualThan,
@@ -56,6 +56,7 @@ enum class TokenKind {
 
     LogicalAnd,
     LogicalOr,
+    LogicalNot,
 
     LeftParen,
     RightParen,
@@ -70,6 +71,7 @@ struct Token {
 
 // Printing/Reporting functions
 std::string token_kind_to_string(TokenKind kind);
+std::string operator_to_string(TokenKind kind);
 std::ostream& operator<<(std::ostream& out, const Token& token);
 std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens);
 

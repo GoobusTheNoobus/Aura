@@ -60,6 +60,9 @@ struct Parser {
     // Multiplication/Division
     std::unique_ptr<BaseAST> parse_multiplicative();
 
+    // Unary Plus/Minus/Not
+    std::unique_ptr<BaseAST> parse_unary();
+
     // Primary (int literal, float literal, parentheses, etc)
     std::unique_ptr<BaseAST> parse_primary();
 

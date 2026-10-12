@@ -31,6 +31,7 @@ struct Evaluator {
 
     private:
     Value evaluate_binary(parse::BinaryOperation& node);
+    Value evaluate_unary(parse::UnaryOperation& node);
 
     // Performs an operation based on types. For example, the % operator only works when both
     // operands are int

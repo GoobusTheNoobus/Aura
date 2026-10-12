@@ -54,7 +54,7 @@ std::string token_kind_to_string(TokenKind kind) {
         return "Percent";
     case parse::TokenKind::EqualEqual:
         return "EqualEqual";
-    case parse::TokenKind::BangEqual:
+    case parse::TokenKind::NotEqual:
         return "BangEqual";
     case parse::TokenKind::LessThan:
         return "LessThan";
@@ -68,6 +68,43 @@ std::string token_kind_to_string(TokenKind kind) {
         return "LogicalAnd";
     case parse::TokenKind::LogicalOr:
         return "LogicalOr";
+    case parse::TokenKind::LogicalNot:
+        return "LogicalNot";
+    default:
+        return "Unknown";
+    }
+}
+
+std::string operator_to_string(TokenKind kind) {
+    switch (kind) {
+    case parse::TokenKind::Minus:
+        return "-";
+    case parse::TokenKind::Plus:
+        return "+";
+    case parse::TokenKind::Star:
+        return "*";
+    case parse::TokenKind::Slash:
+        return "/";
+    case parse::TokenKind::Percent:
+        return "%";
+    case parse::TokenKind::EqualEqual:
+        return "==";
+    case parse::TokenKind::NotEqual:
+        return "!=";
+    case parse::TokenKind::LessThan:
+        return "<";
+    case parse::TokenKind::GreaterThan:
+        return ">";
+    case parse::TokenKind::LessEqualThan:
+        return "<=";
+    case parse::TokenKind::GreaterEqualThan:
+        return ">=";
+    case parse::TokenKind::LogicalAnd:
+        return "&&";
+    case parse::TokenKind::LogicalOr:
+        return "||";
+    case parse::TokenKind::LogicalNot:
+        return "!";
     default:
         return "Unknown";
     }
@@ -89,7 +126,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens) {
 }
 
 bool is_comparison(TokenKind kind) {
-    return kind == TokenKind::EqualEqual || kind == TokenKind::BangEqual ||
+    return kind == TokenKind::EqualEqual || kind == TokenKind::NotEqual ||
            kind == TokenKind::LessEqualThan || kind == TokenKind::LessThan ||
            kind == TokenKind::GreaterThan || kind == TokenKind::GreaterEqualThan;
 }

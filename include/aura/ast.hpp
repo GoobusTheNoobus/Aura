@@ -45,6 +45,7 @@ enum class ASTKind {
     BooleanLiteral,
 
     BinaryOperation,
+    UnaryOperation,
 
     Error,
 };
@@ -131,6 +132,19 @@ struct BinaryOperation : BaseAST {
         out << std::string(indent, ' ') << "BinaryOperation(" << token_kind_to_string(op) << ")\n";
         left->print(out, indent + 2);
         right->print(out, indent + 2);
+    }
+};
+
+// Represents an operation with 1 operand.
+struct UnaryOperation : BaseAST {
+    std::unique_ptr<BaseAST> operand;
+    TokenKind op;
+
+    UnaryOperation(std::unique_ptr<BaseAST> operand, TokenKind op)
+        : BaseAST(ASTKind::UnaryOperation), operand(std::move(operand)), op(op) {}
+    void print(std::ostream& out, i32 indent) const override {
+        out << std::string(indent, ' ') << "UnaryOperation(" << token_kind_to_string(op) << ")\n";
+        operand->print(out, indent + 2);
     }
 };
 

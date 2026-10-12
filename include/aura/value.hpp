@@ -49,6 +49,7 @@ struct Value {
     Value(bool value) : valid(true), data(value) {}
 
     std::string get_type() const;
+    bool is_numeric() const;
 
     // Returns a const pointer to the value of the provided type if our data is meant to store that
     // type, otherwise a nullptr.

@@ -18,6 +18,7 @@
  */
 
 #include "aura/value.hpp"
+#include "aura/ast.hpp"
 #include <ostream>
 #include <string>
 
@@ -46,6 +47,10 @@ std::string Value::get_type() const {
 
     constexpr const char* Map[]{"<int>", "<float>", "<string>", "<bool>"};
     return Map[data.index()];
+}
+
+bool Value::is_numeric() const {
+    return get_if<i32>() || get_if<f64>();
 }
 
 std::ostream& operator<<(std::ostream& out, const Value& value) {
