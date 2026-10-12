@@ -24,58 +24,62 @@
 
 namespace parse {
 
+// The parser walks the token stream and builds an AST that reflects the precedence and grouping
+// rules of the language. Each parser method handles one precedence layer, from the broadest
+// expression down to the leaf nodes.
 struct Parser {
     Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {}
 
+    // Parse a complete program into a root node containing all top-level expressions.
     [[nodiscard]] Program parse();
 
     private:
-    // We store a copy of the token list so we don't need to pass it through
-    // every single helper function
+    // Store a copy of the token list so the parser state can move forward without threading
+    // arguments through every function.
     const std::vector<Token> tokens;
 
-    // We also store an index of which token we are looking at currently
+    // Current token index inside the token stream.
     size_t pos{0};
 
-    // A wrapper to the lowest precedence function
+    // Entry point for expression parsing. This dispatches to the lowest-precedence rule.
     std::unique_ptr<BaseAST> parse_expression();
 
-    // The following functions are sorted from lowest precedence to highest
+    // The following functions are ordered from lowest precedence to highest.
 
-    // Logical Or
+    // Parse logical OR expressions.
     std::unique_ptr<BaseAST> parse_logical_or();
 
-    // Logical And
+    // Parse logical AND expressions.
     std::unique_ptr<BaseAST> parse_logical_and();
 
-    // Equal/Not Equal
+    // Parse equality checks such as == and !=.
     std::unique_ptr<BaseAST> parse_equality();
 
-    // More/Less/MoreEqual/LessEqual
+    // Parse relational checks such as <, <=, >, and >=.
     std::unique_ptr<BaseAST> parse_relational();
 
-    // Addition/Subtraction
+    // Parse additive expressions involving + and -.
     std::unique_ptr<BaseAST> parse_additive();
 
-    // Multiplication/Division
+    // Parse multiplicative expressions involving *, /, and %.
     std::unique_ptr<BaseAST> parse_multiplicative();
 
-    // Unary Plus/Minus/Not
+    // Parse unary operators such as !, +, and -.
     std::unique_ptr<BaseAST> parse_unary();
 
-    // Primary (int literal, float literal, parentheses, etc)
+    // Parse literals, identifiers, and parenthesized expressions.
     std::unique_ptr<BaseAST> parse_primary();
 
-    // Checks if our cursor is at the end of the token list
+    // Returns true when the parser is at the final EOF token.
     bool end() const;
 
-    // Gets the current token
+    // Returns the current token without consuming it.
     const Token& peek() const;
 
-    // Gets a token with a certain offset from our cursor token
+    // Returns a token at a relative offset from the current position.
     const Token& peek(isize offset) const;
 
-    // Advances the cursor by one, but return the token at the original cursor token
+    // Advances the cursor and returns the token that was just consumed.
     const Token& next();
 };
 

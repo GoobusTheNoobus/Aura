@@ -24,35 +24,34 @@
 
 namespace interpreter {
 
-// Represents any of the types supported in Aura
+// A runtime value in Aura. It stores the actual variant payload and a validity flag so invalid
+// expressions can propagate errors in a controlled way without crashing the interpreter.
 struct Value {
 
-    // We use this to represents an "error value," meaning if have something like
-    // (random_invalid_expression)+1, random_invalid_expression would evaluate to an invalid value,
-    // which proprogates to the root of the expression tree
+    // An invalid value is used to represent evaluation failures so the caller can detect and
+    // report them without having to rely on exceptions for ordinary runtime errors.
     bool valid = false;
     std::variant<i32, f64, std::string, bool> data;
 
-    // Default constructor with no value represents an error value
+    // Default constructor creates an invalid value used as an error sentinel.
     Value() = default;
 
-    // Constructs an integer value
+    // Construct an integer runtime value.
     Value(i32 value) : valid(true), data(value) {}
 
-    // Constructs a floating point value
+    // Construct a floating-point runtime value.
     Value(f64 value) : valid(true), data(value) {}
 
-    // Constructs a string
+    // Construct a string runtime value.
     Value(std::string data) : valid(true), data(std::move(data)) {}
 
-    // Constructs a boolean
+    // Construct a boolean runtime value.
     Value(bool value) : valid(true), data(value) {}
 
     std::string get_type() const;
     bool is_numeric() const;
 
-    // Returns a const pointer to the value of the provided type if our data is meant to store that
-    // type, otherwise a nullptr.
+    // Returns a const pointer to the stored value when the active variant matches Type.
     template <typename Type> const Type* get_if() const {
         return std::get_if<Type>(&data);
     }

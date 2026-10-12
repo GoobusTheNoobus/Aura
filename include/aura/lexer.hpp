@@ -27,42 +27,46 @@
 
 namespace parse {
 
+// The lexer walks over the raw source string and emits a token stream. It is responsible for
+// recognizing literals, operators, separators, and comments while discarding insignificant trivia
+// like whitespace.
 struct Lexer {
 
     Lexer(std::string source) : source(std::move(source)) {}
 
+    // Converts the source text into a flat token list that the parser can consume.
     [[nodiscard]] std::vector<Token> tokenize();
 
     private:
-    // We store a copy of the source code so we don't need to pass it
-    // through every helper function
+    // Keep a copy of the original source so helper methods can read the input without needing
+    // additional parameters.
     const std::string source;
 
-    // We also store an index of where we are in the source code.
+    // Cursor position inside the source string.
     size_t pos{0};
 
-    // Skips the line when encountering double slashes for comments
+    // Skip text that follows a comment marker until the end of the current line.
     void skip_comments();
 
-    // Tokenizes when encountering a number digit
+    // Consume a numeric literal such as 42 or 3.14.
     void tokenize_number(std::vector<Token>& tokens);
 
-    // Tokenizes when encountering a letter or underscore
+    // Consume an identifier or keyword such as true, false, or a variable name.
     void tokenize_word(std::vector<Token>& tokens);
 
-    // Tokenizes when encountering double quote
+    // Consume a quoted string literal and decode escape sequences.
     void tokenize_string(std::vector<Token>& tokens);
 
-    // Checks if our cursor is at the end of the source code
+    // Returns true once the lexer reaches the end of the source.
     bool end() const;
 
-    // Gets the current character
+    // Returns the current character without advancing the cursor.
     char peek() const;
 
-    // Gets a character with a certain offset from our cursor character
+    // Returns a character from a relative offset from the current cursor position.
     char peek(isize offset) const;
 
-    // Advances the cursor by one, but return the character at the original cursor character
+    // Advances by one character and returns the character that was just consumed.
     char next();
 };
 } // namespace parse

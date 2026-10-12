@@ -24,10 +24,9 @@
 
 namespace parse {
 
-// We define an enum class to distinguish what type of token
-// we are dealing with. Notice that there isn't any Whitespace or
-// Comment TokenKind. This is because since they don't have any semantic
-// signficance in Aura, they are eliminated.
+// The lexer reduces source text into a stream of tokens. Each token captures both the
+// original text and the kind of syntax it represents so the parser can work with a
+// structured stream rather than raw characters.
 enum class TokenKind {
     EndOfFile,
     Separator,

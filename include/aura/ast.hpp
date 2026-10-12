@@ -26,15 +26,9 @@
 
 namespace parse {
 
-// To make it easier for our interpreter to interpret the code, we can turn
-// our token list into an Abstract Syntax Tree, using the Parser
-// (found in "include/aura/parser.hpp"). Here, you can find some definitions
-// of the AST
-
-// Like our Tokens type, we also define an enum to distinguish types. However,
-// this is more important, as we are dealing with polymorphism, which is handled
-// very badly in C++, so WE need to store the type of the ASTNode instead of C++
-// handling that for us.
+// Each source expression is converted into an abstract syntax tree before it is evaluated.
+// The tree keeps the precedence and structure of the original program in a way that is easy
+// to traverse during parsing and evaluation.
 enum class ASTKind {
     Program, // wraps the entire code
 
