@@ -38,6 +38,8 @@ std::string token_kind_to_string(TokenKind kind) {
         return "BooleanLiteral";
     case parse::TokenKind::Identifier:
         return "Identifier";
+    case parse::TokenKind::KeywordLet:
+        return "KeywordLet";
     case parse::TokenKind::LeftParen:
         return "LeftParen";
     case parse::TokenKind::RightParen:
@@ -52,6 +54,8 @@ std::string token_kind_to_string(TokenKind kind) {
         return "Slash";
     case parse::TokenKind::Percent:
         return "Percent";
+    case parse::TokenKind::Equal:
+        return "Equal";
     case parse::TokenKind::EqualEqual:
         return "EqualEqual";
     case parse::TokenKind::NotEqual:

@@ -102,8 +102,9 @@ std::vector<Token> Lexer::tokenize() {
                 continue;
             }
 
-            // We don't have single equal yet, so we fall through
-            break;
+            tokens.push_back({"=", TokenKind::Equal});
+            next();
+            continue;
 
         case '!':
 
@@ -249,6 +250,12 @@ void Lexer::tokenize_word(std::vector<Token>& tokens) {
     // Boolean
     if (value == "true" || value == "false") {
         tokens.push_back({value, TokenKind::BooleanLiteral});
+        return;
+    }
+
+    // Keyword(s)
+    if (value == "let") {
+        tokens.push_back({value, TokenKind::KeywordLet});
         return;
     }
 

@@ -41,6 +41,8 @@ enum class ASTKind {
     BinaryOperation,
     UnaryOperation,
 
+    VariableDeclaration,
+
     Error,
 };
 
@@ -111,6 +113,19 @@ struct BooleanLiteral : BaseAST {
     BooleanLiteral(bool value) : BaseAST(ASTKind::BooleanLiteral), value(value) {}
     void print(std::ostream& out, i32 indent) const override {
         out << std::string(indent, ' ') << "BooleanLiteral(" << (value ? "true" : "false") << ")\n";
+    }
+};
+
+// Represents a variable declaration
+struct VariableDeclaration : BaseAST {
+    std::unique_ptr<BaseAST> value;
+    std::string name;
+
+    VariableDeclaration(std::string name, std::unique_ptr<BaseAST> value)
+        : BaseAST(ASTKind::VariableDeclaration), value(std::move(value)), name(std::move(name)) {}
+    void print(std::ostream& out, i32 indent) const override {
+        out << std::string(indent, ' ') << "VariableDeclaration(" << name << ")\n";
+        value->print(out, indent + 2);
     }
 };
 

@@ -38,13 +38,14 @@ enum class TokenKind {
     StringLiteral,
     BooleanLiteral,
 
-    // TODO: Add BoolLiteral and impl related stuff
+    KeywordLet,
 
     Plus,
     Minus,
     Star,
     Slash,
     Percent,
+    Equal,
 
     EqualEqual,
     NotEqual,

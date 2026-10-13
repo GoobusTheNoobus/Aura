@@ -126,16 +126,16 @@ const std::vector<TestCase> Tests = {
 
     {"Strings", "Empty string", "\"\"", ""},
     {"Strings", "Simple string", "\"hello\"", "hello"},
-    {"Strings", "String concatenation", "\"hello\" + \" world\"", "hello world"},
+    {"Strings", "String concatenation", R"("hello" + " world")", "hello world"},
     {"Strings", "Concatenation with integer", "1 + \"Hi\"", "1Hi"},
     {"Strings", "Concatenation with empty string", "1 + \"\"", "1"},
     {"Strings", "Single-quoted string", "'hello'", "hello"},
-    {"Strings", "Escaped newline", "\"Hello\\nworld!\"", "Hello\nworld!"},
-    {"Strings", "Escaped tab", "\"Hello\\tworld!\"", "Hello\tworld!"},
-    {"Strings", "Escaped double quote", "\"She said \\\"hello\\\"\"", "She said \"hello\""},
-    {"Strings", "Escaped backslash", "\"C:\\\\Aura\"", "C:\\Aura"},
-    {"Strings", "Concatenation precedence", "\"a\" + \"b\" + \"c\"", "abc"},
-    {"Strings", "Parenthesized concatenation", "(\"hello\" + \" \") + \"world\"", "hello world"},
+    {"Strings", "Escaped newline", R"("Hello\nworld!")", "Hello\nworld!"},
+    {"Strings", "Escaped tab", R"("Hello\tworld!")", "Hello\tworld!"},
+    {"Strings", "Escaped double quote", R"("She said \"hello\"")", "She said \"hello\""},
+    {"Strings", "Escaped backslash", R"("C:\\Aura")", "C:\\Aura"},
+    {"Strings", "Concatenation precedence", R"("a" + "b" + "c")", "abc"},
+    {"Strings", "Parenthesized concatenation", R"(("hello" + " ") + "world")", "hello world"},
 
     // ==================================================
     // =================== Sequences ====================
@@ -144,8 +144,19 @@ const std::vector<TestCase> Tests = {
     {"Sequences", "Semicolon separator", "1;2", "1\n2"},
     {"Sequences", "Three expressions", "1;2;3", "1\n2\n3"},
     {"Sequences", "Independent expressions", "1 + 2; 3 * 4; 5 - 1", "3\n12\n4"},
-    {"Sequences", "Complex expression sequence", "1 + 2 * 3; !(4 > 5); \"a\" + \"b\"",
+    {"Sequences", "Complex expression sequence", R"(1 + 2 * 3; !(4 > 5); "a" + "b")",
      "7\ntrue\nab"},
+
+    // ==================================================
+    // ================== Declarations ==================
+    // ==================================================
+
+    {"Declarations", "Variable Declaration", "let num = 3", "3"},
+    {"Declarations", "Expression Declaration", "let num = 4 / 3 + (5.5 + 12 % 3) - 3.5",
+     "3.333333"},
+    {"Declarations", "Variable Usage", R"(let str = "Hello, "; str + "world!")",
+     "Hello, \nHello, world!"},
+    {"Declarations", "Boolean Variable", "let yes = true || false; !yes", "true\nfalse"},
 };
 
 TestResult run_test(const TestCase& test) {
@@ -159,7 +170,7 @@ TestResult run_test(const TestCase& test) {
 
         for (auto& node : ast.children) {
 
-            // We seperate each result with a new line character. However, not every single one gets
+            // We separate each result with a new line character. However, not every single one gets
             // one. For example, 1 + 1; true doesn't become 2\ntrue\n, as there is no need for the
             // last \n
             if (!actual.empty()) {

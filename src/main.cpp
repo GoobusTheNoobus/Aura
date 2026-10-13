@@ -35,6 +35,9 @@ int main() {
     std::cout << "Type `help` if you are confused.\n";
     std::cout << "Type `quit` to exit this console.\n";
 
+    // We put it outside of the loop so variables persist across iterations
+    Evaluator evaluator;
+
     // We simulate a shell, evaluating whatever the user
     // puts in.
     while (true) {
@@ -68,11 +71,10 @@ int main() {
         Program program = parser.parse();
 
         if (error_encountered) {
-            program.print(std::cout, 0);
+            // program.print(std::cout, 0);
             continue;
         }
 
-        Evaluator evaluator;
         for (auto& node : program.children) {
             Value value = evaluator.evaluate(node);
             if (error_encountered) {

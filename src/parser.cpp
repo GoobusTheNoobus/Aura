@@ -44,8 +44,31 @@ Program Parser::parse() {
 }
 
 std::unique_ptr<BaseAST> Parser::parse_expression() {
-    // Just a wrapper function around the lowest precedence parsing helper
-    return parse_logical_or();
+    switch (peek().kind) {
+    case TokenKind::KeywordLet: {
+        next();
+
+        std::string name = peek().value;
+        if (peek().kind == TokenKind::Identifier) {
+            next();
+        } else {
+            report_error(ErrorKind::Parsing, "Expected an identifier");
+        }
+
+        if (peek().kind == TokenKind::Equal) {
+            next();
+        } else {
+            report_error(ErrorKind::Parsing, "Expected '=', got '{}'", peek().value);
+        }
+
+        auto declaration = std::make_unique<VariableDeclaration>(name, parse_expression());
+        return declaration;
+    }
+
+    // We fallback to an expression.
+    default:
+        return parse_logical_or();
+    }
 }
 
 std::unique_ptr<BaseAST> Parser::parse_logical_or() {

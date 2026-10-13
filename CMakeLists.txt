@@ -48,6 +48,7 @@ set(AURA_SOURCES
     src/parser.cpp
     src/evaluator.cpp
     src/value.cpp
+    src/scope.cpp
 
     include/aura/token.hpp
     include/aura/lexer.hpp
@@ -57,6 +58,7 @@ set(AURA_SOURCES
     include/aura/diagnostic.hpp
     include/aura/evaluator.hpp
     include/aura/value.hpp
+    include/aura/scope.hpp
 )
 
 target_sources(aura PRIVATE 

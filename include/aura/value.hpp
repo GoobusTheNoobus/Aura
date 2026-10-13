@@ -31,7 +31,7 @@ struct Value {
     // An invalid value is used to represent evaluation failures so the caller can detect and
     // report them without having to rely on exceptions for ordinary runtime errors.
     bool valid = false;
-    std::variant<i32, f64, std::string, bool> data;
+    std::variant<std::monostate, i32, f64, std::string, bool> data;
 
     // Default constructor creates an invalid value used as an error sentinel.
     Value() = default;
@@ -47,6 +47,9 @@ struct Value {
 
     // Construct a boolean runtime value.
     Value(bool value) : valid(true), data(value) {}
+
+    // Constructs a void value.
+    Value(std::monostate) : valid(true), data(std::monostate{}) {}
 
     std::string get_type() const;
     bool is_numeric() const;

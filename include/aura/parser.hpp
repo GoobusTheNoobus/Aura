@@ -41,7 +41,8 @@ struct Parser {
     // Current token index inside the token stream.
     size_t pos{0};
 
-    // Entry point for expression parsing. This dispatches to the lowest-precedence rule.
+    // Entry point for expression parsing. Also parses things that technically aren't expressions,
+    // like variable declarations
     std::unique_ptr<BaseAST> parse_expression();
 
     // The following functions are ordered from lowest precedence to highest.

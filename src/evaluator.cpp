@@ -30,25 +30,25 @@ namespace interpreter {
 Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
     switch (node->kind) {
     case parse::ASTKind::Identifier:
-        // We don't support identifiers yet
-        report_error(ErrorKind::Runtime, "Unknown variable '{}'",
-                     static_cast<parse::Identifier&>(*node).name);
-        return Value();
+        return evaluate_identifier(static_cast<parse::Identifier&>(*node));
 
     // Just raw literal values
     case parse::ASTKind::FloatLiteral:
-        return Value(static_cast<parse::FloatLiteral&>(*node).value);
+        return {static_cast<parse::FloatLiteral&>(*node).value};
     case parse::ASTKind::IntLiteral:
-        return Value(static_cast<parse::IntLiteral&>(*node).value);
+        return {static_cast<parse::IntLiteral&>(*node).value};
     case parse::ASTKind::StringLiteral:
-        return Value(static_cast<parse::StringLiteral&>(*node).value);
+        return {static_cast<parse::StringLiteral&>(*node).value};
     case parse::ASTKind::BooleanLiteral:
-        return Value(static_cast<parse::BooleanLiteral&>(*node).value);
+        return {static_cast<parse::BooleanLiteral&>(*node).value};
 
     case parse::ASTKind::BinaryOperation:
         return evaluate_binary(static_cast<parse::BinaryOperation&>(*node));
     case parse::ASTKind::UnaryOperation:
         return evaluate_unary(static_cast<parse::UnaryOperation&>(*node));
+
+    case parse::ASTKind::VariableDeclaration:
+        return evaluate_declaration(static_cast<parse::VariableDeclaration&>(*node));
 
     default: {
         throw std::runtime_error("Unknown node kind id=" +
@@ -64,7 +64,12 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
 
     // Propagate errors if either operand failed to evaluate.
     if (!left.valid || !right.valid)
-        return Value();
+        return {};
+
+    // Void
+    if (left.get_type() == "<void>" || right.get_type() == "<void>") {
+        return Value(std::monostate{});
+    }
 
     // C++ variants are quite annoying
 
@@ -118,35 +123,35 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
     if (invalid_operands) {
         report_error(ErrorKind::Runtime, "Invalid operand types {} and {} for binary operator '{}'",
                      left.get_type(), right.get_type(), parse::operator_to_string(node.op));
-        return Value();
+        return {};
     }
 
     // Handle logical operation
     if (is_logical_operation) {
         if (node.op == parse::TokenKind::LogicalOr) {
-            return Value(*left_bool || *right_bool);
+            return {*left_bool || *right_bool};
         }
 
-        return Value(*left_bool && *right_bool);
+        return {*left_bool && *right_bool};
     }
 
     // Handle comparisons.
     if (is_comparison) {
         if (is_equality_comparison && (left_string || right_string)) {
-            const bool both_are_strings = left_string && right_string;
+            bool both_are_strings = left_string && right_string;
 
             if (!both_are_strings)
-                return Value(node.op == parse::TokenKind::NotEqual);
+                return {node.op == parse::TokenKind::NotEqual};
 
             return do_comparison_operation(node.op, *left_string, *right_string);
         }
 
-        const bool should_convert_to_float = left_float || right_float;
+        bool should_convert_to_float = left_float || right_float;
 
         if (should_convert_to_float) {
-            const f64 left_value = left_float ? *left_float : static_cast<f64>(*left_int);
+            f64 left_value = left_float ? *left_float : static_cast<f64>(*left_int);
 
-            const f64 right_value = right_float ? *right_float : static_cast<f64>(*right_int);
+            f64 right_value = right_float ? *right_float : static_cast<f64>(*right_int);
 
             return do_comparison_operation(node.op, left_value, right_value);
         }
@@ -156,7 +161,7 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
 
     // Handle string concatenation.
     if (is_string_concat) {
-        return Value(left.to_string() + right.to_string());
+        return {left.to_string() + right.to_string()};
     }
 
     // Handle numeric arithmetic.
@@ -192,26 +197,26 @@ Value Evaluator::do_numeric_operation(parse::TokenKind op, Type left, Type right
         if constexpr (std::is_same_v<Type, f64>) {
             if (right == 0) {
                 report_error(ErrorKind::Runtime, "Cannot divide by zero");
-                return Value();
+                return {};
             }
 
             return Value(left / right);
         } else {
             throw std::runtime_error("Template: Division requires floating point operands");
-            return Value();
+            return {};
         }
 
     case parse::TokenKind::Percent:
         if constexpr (std::is_same_v<Type, i32>) {
             if (right == 0) {
                 report_error(ErrorKind::Runtime, "Cannot divide by zero");
-                return Value();
+                return {};
             }
 
             return Value(left % right);
         } else {
             report_error(ErrorKind::Runtime, "Remainder requires integer operands");
-            return Value();
+            return {};
         }
 
     default:
@@ -249,7 +254,7 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
         if (!value.is_numeric()) {
             report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
                          value.get_type(), parse::operator_to_string(node.op));
-            return Value();
+            return {};
         }
 
         if (node.op == parse::TokenKind::Plus) {
@@ -260,11 +265,11 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
         const i32* op_int = value.get_if<i32>();
         const f64* op_float = value.get_if<f64>();
 
-        // We do - on whatever is inside value. However, since C++ is statically typed, we have to
-        // actually check which one we need to do. Shame on you, C++.
+        // We do - on whatever is inside value. However, since C++ is statically typed, we have
+        // to actually check which one we need to do. Shame on you, C++.
 
-        // We also cannot use ?: since the types get converted to each other based on some obscure
-        // C++ typing rules. Shame on you, C++.
+        // We also cannot use ?: since the types get converted to each other based on some
+        // obscure C++ typing rules. Shame on you, C++.
         if (op_int) {
             return -*op_int;
         }
@@ -280,7 +285,7 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
         if (!op_bool) {
             report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
                          value.get_type(), parse::operator_to_string(node.op));
-            return Value();
+            return {};
         }
 
         return !*op_bool;
@@ -289,6 +294,32 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
     default:
         throw std::runtime_error("Unknown unary operation");
     }
+}
+
+Value Evaluator::evaluate_identifier(parse::Identifier& node) {
+
+    Symbol* symbol = global.lookup(node.name);
+
+    if (!symbol) {
+        report_error(ErrorKind::Runtime, "Unknown symbol '{}'", node.name);
+        return {};
+    }
+
+    return {symbol->value};
+}
+
+Value Evaluator::evaluate_declaration(parse::VariableDeclaration& node) {
+
+    if (global.lookup(node.name)) {
+        report_error(ErrorKind::Runtime, "Redeclaration of symbol '{}'", node.name);
+        return {};
+    }
+
+    Value value = evaluate(node.value);
+
+    global.define({node.name, value});
+
+    return value;
 }
 
 } // namespace interpreter

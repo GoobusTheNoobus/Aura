@@ -20,6 +20,7 @@
 #pragma once
 #include "ast.hpp"
 #include "aura/token.hpp"
+#include "scope.hpp"
 #include "value.hpp"
 #include <memory>
 
@@ -32,11 +33,20 @@ struct Evaluator {
     Value evaluate(std::unique_ptr<parse::BaseAST>& node);
 
     private:
+    // Variables
+    Scope global;
+
     // Evaluate a binary operation by recursively evaluating both operands.
     Value evaluate_binary(parse::BinaryOperation& node);
 
     // Evaluate a unary operation such as -, +, or !.
     Value evaluate_unary(parse::UnaryOperation& node);
+
+    // Evaluate a variable, report error if its invalid
+    Value evaluate_identifier(parse::Identifier& node);
+
+    // Evaluates the declaration of a variable like `let x = 4`
+    Value evaluate_declaration(parse::VariableDeclaration& node);
 
     // Apply numeric operators to the provided operands while enforcing Aura's type rules.
     template <typename Type>
