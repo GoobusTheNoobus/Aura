@@ -17,14 +17,14 @@
  * All rights reserved.
  */
 
-#include "aura/diagnostic.hpp"
-#include "aura/evaluator.hpp"
-#include <vector>
 #define VERSION "0.1.0"
 
+#include "aura/diagnostic.hpp"
+#include "aura/evaluator.hpp"
 #include "aura/lexer.hpp"
 #include "aura/parser.hpp"
 #include <iostream>
+#include <vector>
 
 using namespace parse;
 using namespace interpreter;
