@@ -3,5 +3,5 @@ IndentWidth: 4
 PointerAlignment: Left
 AccessModifierOffset: 0
 NamespaceIndentation: None
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
 ColumnLimit: 100

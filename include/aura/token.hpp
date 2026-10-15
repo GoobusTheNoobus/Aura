@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-namespace parse {
+namespace aura::parse {
 
 // The lexer reduces source text into a stream of tokens. Each token captures both the
 // original text and the kind of syntax it represents so the parser can work with a
@@ -77,4 +77,4 @@ std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens);
 
 bool is_comparison(TokenKind kind);
 
-} // namespace parse
+} // namespace aura::parse

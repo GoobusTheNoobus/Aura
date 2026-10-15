@@ -19,7 +19,7 @@
 
 #include "aura/scope.hpp"
 
-namespace interpreter {
+namespace aura::interpreter {
 
 void Scope::define(Symbol symbol) {
     map[symbol.name] = std::move(symbol);
@@ -35,4 +35,4 @@ Symbol* Scope::lookup(const std::string& name) {
     return &it->second;
 }
 
-} // namespace interpreter
+} // namespace aura::interpreter

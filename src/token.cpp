@@ -19,7 +19,7 @@
 
 #include "aura/token.hpp"
 
-namespace parse {
+namespace aura::parse {
 
 std::string token_kind_to_string(TokenKind kind) {
     // Shame on C++ for not having a built in enum to string
@@ -135,4 +135,4 @@ bool is_comparison(TokenKind kind) {
            kind == TokenKind::GreaterThan || kind == TokenKind::GreaterEqualThan;
 }
 
-} // namespace parse
+} // namespace aura::parse

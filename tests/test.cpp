@@ -161,9 +161,9 @@ const std::vector<TestCase> Tests = {
 
 TestResult run_test(const TestCase& test) {
     try {
-        parse::Lexer lexer(test.input);
-        parse::Parser parser(lexer.tokenize());
-        interpreter::Evaluator evaluator;
+        aura::parse::Lexer lexer(test.input);
+        aura::parse::Parser parser(lexer.tokenize());
+        aura::interpreter::Evaluator evaluator;
 
         auto ast = parser.parse();
         std::string actual;

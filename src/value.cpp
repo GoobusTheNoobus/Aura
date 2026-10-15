@@ -23,7 +23,7 @@
 #include <ostream>
 #include <string>
 
-namespace interpreter {
+namespace aura::interpreter {
 
 std::string Value::to_string() const {
 
@@ -59,4 +59,4 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
     return out;
 }
 
-} // namespace interpreter
+} // namespace aura::interpreter

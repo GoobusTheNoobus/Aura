@@ -27,8 +27,9 @@
 #include <iostream>
 #include <vector>
 
-using namespace parse;
-using namespace interpreter;
+using namespace aura;
+using namespace aura::parse;
+using namespace aura::interpreter;
 
 int main() {
 

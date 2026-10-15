@@ -22,7 +22,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace interpreter {
+namespace aura::interpreter {
 
 struct Symbol {
     std::string name;
@@ -37,4 +37,4 @@ struct Scope {
     std::unordered_map<std::string, Symbol> map;
 };
 
-} // namespace interpreter
+} // namespace aura::interpreter

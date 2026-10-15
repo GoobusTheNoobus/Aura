@@ -22,7 +22,7 @@
 #include <ostream>
 #include <variant>
 
-namespace interpreter {
+namespace aura::interpreter {
 
 // A runtime value in Aura. It stores the actual variant payload and a validity flag so invalid
 // expressions can propagate errors in a controlled way without crashing the interpreter.
@@ -37,19 +37,24 @@ struct Value {
     Value() = default;
 
     // Construct an integer runtime value.
-    Value(i32 value) : valid(true), data(value) {}
+    Value(i32 value) : valid(true), data(value) {
+    }
 
     // Construct a floating-point runtime value.
-    Value(f64 value) : valid(true), data(value) {}
+    Value(f64 value) : valid(true), data(value) {
+    }
 
     // Construct a string runtime value.
-    Value(std::string data) : valid(true), data(std::move(data)) {}
+    Value(std::string data) : valid(true), data(std::move(data)) {
+    }
 
     // Construct a boolean runtime value.
-    Value(bool value) : valid(true), data(value) {}
+    Value(bool value) : valid(true), data(value) {
+    }
 
     // Constructs a void value.
-    Value(std::monostate) : valid(true), data(std::monostate{}) {}
+    Value(std::monostate) : valid(true), data(std::monostate{}) {
+    }
 
     std::string get_type() const;
     bool is_numeric() const;
@@ -65,4 +70,4 @@ struct Value {
 // Printing support
 std::ostream& operator<<(std::ostream& out, const Value& value);
 
-} // namespace interpreter
+} // namespace aura::interpreter

@@ -49,6 +49,7 @@ set(AURA_SOURCES
     src/evaluator.cpp
     src/value.cpp
     src/scope.cpp
+    src/ast.cpp
 
     include/aura/token.hpp
     include/aura/lexer.hpp

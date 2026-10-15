@@ -21,7 +21,7 @@
 #include "aura/diagnostic.hpp"
 #include "aura/token.hpp"
 
-namespace parse {
+namespace aura::parse {
 
 std::vector<Token> Lexer::tokenize() {
     // We return early if there is nothing to tokenize
@@ -345,4 +345,4 @@ char Lexer::next() {
     return c;
 }
 
-} // namespace parse
+} // namespace aura::parse

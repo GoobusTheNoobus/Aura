@@ -25,14 +25,15 @@
 #include <string>
 #include <vector>
 
-namespace parse {
+namespace aura::parse {
 
 // The lexer walks over the raw source string and emits a token stream. It is responsible for
 // recognizing literals, operators, separators, and comments while discarding insignificant trivia
 // like whitespace.
 struct Lexer {
 
-    Lexer(std::string source) : source(std::move(source)) {}
+    Lexer(std::string source) : source(std::move(source)) {
+    }
 
     // Converts the source text into a flat token list that the parser can consume.
     [[nodiscard]] std::vector<Token> tokenize();
@@ -69,4 +70,4 @@ struct Lexer {
     // Advances by one character and returns the character that was just consumed.
     char next();
 };
-} // namespace parse
+} // namespace aura::parse

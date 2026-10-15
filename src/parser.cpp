@@ -24,7 +24,7 @@
 
 #include <memory>
 
-namespace parse {
+namespace aura::parse {
 
 Program Parser::parse() {
     Program program;
@@ -242,4 +242,4 @@ const Token& Parser::next() {
     return token;
 }
 
-} // namespace parse
+} // namespace aura::parse

@@ -23,6 +23,10 @@
 #include <iostream>
 #include <utility>
 
+namespace aura {
+
+// TODO: Make better Diagnostic system
+
 inline bool error_encountered = false;
 
 enum class ErrorKind {
@@ -50,3 +54,5 @@ void report_error(ErrorKind kind, std::format_string<Args...> format, Args... ar
     std::cerr << std::format(format, std::forward<Args>(args)...) << '\n' << ansi::Reset;
     error_encountered = true;
 }
+
+} // namespace aura

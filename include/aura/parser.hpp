@@ -22,13 +22,14 @@
 #include <memory>
 #include <vector>
 
-namespace parse {
+namespace aura::parse {
 
 // The parser walks the token stream and builds an AST that reflects the precedence and grouping
 // rules of the language. Each parser method handles one precedence layer, from the broadest
 // expression down to the leaf nodes.
 struct Parser {
-    Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {}
+    Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {
+    }
 
     // Parse a complete program into a root node containing all top-level expressions.
     [[nodiscard]] Program parse();
@@ -84,4 +85,4 @@ struct Parser {
     const Token& next();
 };
 
-} // namespace parse
+} // namespace aura::parse

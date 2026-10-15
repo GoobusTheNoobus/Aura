@@ -26,30 +26,32 @@
 #include <stdexcept>
 #include <string>
 
-namespace interpreter {
+namespace aura::interpreter {
 
-Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
+Value Evaluator::evaluate(std::unique_ptr<BaseAST>& node) {
     switch (node->kind) {
-    case parse::ASTKind::Identifier:
-        return evaluate_identifier(static_cast<parse::Identifier&>(*node));
 
-    // Just raw literal values
-    case parse::ASTKind::FloatLiteral:
-        return {static_cast<parse::FloatLiteral&>(*node).value};
-    case parse::ASTKind::IntLiteral:
-        return {static_cast<parse::IntLiteral&>(*node).value};
-    case parse::ASTKind::StringLiteral:
-        return {static_cast<parse::StringLiteral&>(*node).value};
-    case parse::ASTKind::BooleanLiteral:
-        return {static_cast<parse::BooleanLiteral&>(*node).value};
+    // Primaries
+    case ASTKind::Identifier:
+        return evaluate_identifier(static_cast<Identifier&>(*node));
+    case ASTKind::FloatLiteral:
+        return {static_cast<FloatLiteral&>(*node).value};
+    case ASTKind::IntLiteral:
+        return {static_cast<IntLiteral&>(*node).value};
+    case ASTKind::StringLiteral:
+        return {static_cast<StringLiteral&>(*node).value};
+    case ASTKind::BooleanLiteral:
+        return {static_cast<BooleanLiteral&>(*node).value};
 
-    case parse::ASTKind::BinaryOperation:
-        return evaluate_binary(static_cast<parse::BinaryOperation&>(*node));
-    case parse::ASTKind::UnaryOperation:
-        return evaluate_unary(static_cast<parse::UnaryOperation&>(*node));
+    // Operations
+    case ASTKind::BinaryOperation:
+        return evaluate_binary(static_cast<BinaryOperation&>(*node));
+    case ASTKind::UnaryOperation:
+        return evaluate_unary(static_cast<UnaryOperation&>(*node));
 
-    case parse::ASTKind::VariableDeclaration:
-        return evaluate_declaration(static_cast<parse::VariableDeclaration&>(*node));
+    // Variables
+    case ASTKind::VariableDeclaration:
+        return evaluate_declaration(static_cast<VariableDeclaration&>(*node));
 
     default: {
         throw std::runtime_error("Unknown node kind id=" +
@@ -58,7 +60,7 @@ Value Evaluator::evaluate(std::unique_ptr<parse::BaseAST>& node) {
     }
 }
 
-Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
+Value Evaluator::evaluate_binary(BinaryOperation& node) {
 
     Value left = evaluate(node.left);
     Value right = evaluate(node.right);
@@ -90,12 +92,12 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
 
     bool is_logical_operation =
         node.op == parse::TokenKind::LogicalAnd || node.op == parse::TokenKind::LogicalOr;
-    bool is_comparison = parse::is_comparison(node.op);
+    bool comparison = is_comparison(node.op);
 
     bool is_equality_comparison =
         node.op == parse::TokenKind::EqualEqual || node.op == parse::TokenKind::NotEqual;
 
-    bool is_relational_comparison = is_comparison && !is_equality_comparison;
+    bool is_relational_comparison = comparison && !is_equality_comparison;
 
     bool is_string_concat = node.op == parse::TokenKind::Plus && (left_string || right_string);
 
@@ -123,7 +125,7 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
 
     if (invalid_operands) {
         report_error(ErrorKind::Runtime, "Invalid operand types {} and {} for binary operator '{}'",
-                     left.get_type(), right.get_type(), parse::operator_to_string(node.op));
+                     left.get_type(), right.get_type(), operator_to_string(node.op));
         return {};
     }
 
@@ -136,8 +138,12 @@ Value Evaluator::evaluate_binary(parse::BinaryOperation& node) {
         return {*left_bool && *right_bool};
     }
 
-    // Handle comparisons.
-    if (is_comparison) {
+    // Handle comparisons
+    if (comparison) {
+
+        // Equality works with any 2 types
+        // You can do "Hello world" == 2 and it will be false.
+        // You cannot do "Hello world" < 2 though
         if (is_equality_comparison && (left_string || right_string)) {
             bool both_are_strings = left_string && right_string;
 
@@ -241,11 +247,11 @@ Value Evaluator::do_comparison_operation(parse::TokenKind kind, Type left, Type 
     case parse::TokenKind::GreaterEqualThan:
         return Value(left >= right);
     default:
-        throw std::runtime_error("Unknown comparison operator " + parse::operator_to_string(kind));
+        throw std::runtime_error("Unknown comparison operator " + operator_to_string(kind));
     }
 }
 
-Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
+Value Evaluator::evaluate_unary(UnaryOperation& node) {
     switch (node.op) {
     case parse::TokenKind::Plus:
     case parse::TokenKind::Minus: {
@@ -254,7 +260,7 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
         // Plus and Minus unarys only work for numeric types
         if (!value.is_numeric()) {
             report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
-                         value.get_type(), parse::operator_to_string(node.op));
+                         value.get_type(), operator_to_string(node.op));
             return {};
         }
 
@@ -285,7 +291,7 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
 
         if (!op_bool) {
             report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
-                         value.get_type(), parse::operator_to_string(node.op));
+                         value.get_type(), operator_to_string(node.op));
             return {};
         }
 
@@ -297,7 +303,7 @@ Value Evaluator::evaluate_unary(parse::UnaryOperation& node) {
     }
 }
 
-Value Evaluator::evaluate_identifier(parse::Identifier& node) {
+Value Evaluator::evaluate_identifier(Identifier& node) {
 
     Symbol* symbol = global.lookup(node.name);
 
@@ -309,7 +315,7 @@ Value Evaluator::evaluate_identifier(parse::Identifier& node) {
     return {symbol->value};
 }
 
-Value Evaluator::evaluate_declaration(parse::VariableDeclaration& node) {
+Value Evaluator::evaluate_declaration(VariableDeclaration& node) {
 
     if (global.lookup(node.name)) {
         report_error(ErrorKind::Runtime, "Redeclaration of symbol '{}'", node.name);
@@ -323,4 +329,4 @@ Value Evaluator::evaluate_declaration(parse::VariableDeclaration& node) {
     return value;
 }
 
-} // namespace interpreter
+} // namespace aura::interpreter

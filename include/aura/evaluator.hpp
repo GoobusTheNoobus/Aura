@@ -24,29 +24,29 @@
 #include "value.hpp"
 #include <memory>
 
-namespace interpreter {
+namespace aura::interpreter {
 
 // The evaluator walks the AST and reduces each node to a concrete runtime value. It is the
 // runtime stage that performs arithmetic, comparisons, logical checks, and string concatenation.
 struct Evaluator {
     // Evaluate a single AST node and return its runtime value.
-    Value evaluate(std::unique_ptr<parse::BaseAST>& node);
+    Value evaluate(std::unique_ptr<BaseAST>& node);
 
     private:
     // Variables
     Scope global;
 
     // Evaluate a binary operation by recursively evaluating both operands.
-    Value evaluate_binary(parse::BinaryOperation& node);
+    Value evaluate_binary(BinaryOperation& node);
 
     // Evaluate a unary operation such as -, +, or !.
-    Value evaluate_unary(parse::UnaryOperation& node);
+    Value evaluate_unary(UnaryOperation& node);
 
     // Evaluate a variable, report error if its invalid
-    Value evaluate_identifier(parse::Identifier& node);
+    Value evaluate_identifier(Identifier& node);
 
     // Evaluates the declaration of a variable like `let x = 4`
-    Value evaluate_declaration(parse::VariableDeclaration& node);
+    Value evaluate_declaration(VariableDeclaration& node);
 
     // Apply numeric operators to the provided operands while enforcing Aura's type rules.
     template <typename Type>
@@ -57,4 +57,4 @@ struct Evaluator {
     Value do_comparison_operation(parse::TokenKind kind, Type left, Type right);
 };
 
-} // namespace interpreter
+} // namespace aura::interpreter

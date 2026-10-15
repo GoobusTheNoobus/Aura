@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace aura {
 // These colours can be used for error/warnings
 namespace ansi {
 
@@ -44,3 +45,5 @@ using f64 = double;
 
 using isize = std::ptrdiff_t;
 using usize = std::size_t;
+
+} // namespace aura
