@@ -19,8 +19,8 @@
 
 #pragma once
 #include "ast.hpp"
-#include "aura/token.hpp"
 #include "scope.hpp"
+#include "token.hpp"
 #include "value.hpp"
 #include <memory>
 

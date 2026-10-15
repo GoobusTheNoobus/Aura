@@ -18,7 +18,7 @@
  */
 
 #pragma once
-#include "aura/ast.hpp"
+#include "ast.hpp"
 #include <format>
 #include <iostream>
 #include <utility>

@@ -21,6 +21,7 @@
 #include "aura/ast.hpp"
 #include "aura/diagnostic.hpp"
 #include "aura/token.hpp"
+
 #include <memory>
 
 namespace parse {
