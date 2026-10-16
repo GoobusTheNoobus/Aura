@@ -52,10 +52,11 @@ Value Evaluator::evaluate(std::unique_ptr<BaseAST>& node) {
     // Variables
     case ASTKind::VariableDeclaration:
         return evaluate_declaration(static_cast<VariableDeclaration&>(*node));
+    case ASTKind::VariableAssignment:
+        return evaluate_assignment(static_cast<VariableAssignment&>(*node));
 
     default: {
-        throw std::runtime_error("Unknown node kind id=" +
-                                 std::to_string(static_cast<i32>(node->kind)));
+        throw std::runtime_error("Unknown node kind id=" + std::to_string(static_cast<i32>(node->kind)));
     }
     }
 }
@@ -90,12 +91,10 @@ Value Evaluator::evaluate_binary(BinaryOperation& node) {
 
     bool operands_are_numeric = (left_int || left_float) && (right_int || right_float);
 
-    bool is_logical_operation =
-        node.op == parse::TokenKind::LogicalAnd || node.op == parse::TokenKind::LogicalOr;
+    bool is_logical_operation = node.op == parse::TokenKind::LogicalAnd || node.op == parse::TokenKind::LogicalOr;
     bool comparison = is_comparison(node.op);
 
-    bool is_equality_comparison =
-        node.op == parse::TokenKind::EqualEqual || node.op == parse::TokenKind::NotEqual;
+    bool is_equality_comparison = node.op == parse::TokenKind::EqualEqual || node.op == parse::TokenKind::NotEqual;
 
     bool is_relational_comparison = comparison && !is_equality_comparison;
 
@@ -124,8 +123,8 @@ Value Evaluator::evaluate_binary(BinaryOperation& node) {
     }
 
     if (invalid_operands) {
-        report_error(ErrorKind::Runtime, "Invalid operand types {} and {} for binary operator '{}'",
-                     left.get_type(), right.get_type(), operator_to_string(node.op));
+        report_error(ErrorKind::Runtime, "Invalid operand types {} and {} for binary operator '{}'", left.get_type(),
+                     right.get_type(), operator_to_string(node.op));
         return {};
     }
 
@@ -185,8 +184,7 @@ Value Evaluator::evaluate_binary(BinaryOperation& node) {
     return do_numeric_operation<i32>(node.op, *left_int, *right_int);
 }
 
-template <typename Type>
-Value Evaluator::do_numeric_operation(parse::TokenKind op, Type left, Type right) {
+template <typename Type> Value Evaluator::do_numeric_operation(parse::TokenKind op, Type left, Type right) {
     switch (op) {
         // The following operators work on both ints and floats
     case parse::TokenKind::Plus:
@@ -231,8 +229,7 @@ Value Evaluator::do_numeric_operation(parse::TokenKind op, Type left, Type right
     }
 }
 
-template <typename Type>
-Value Evaluator::do_comparison_operation(parse::TokenKind kind, Type left, Type right) {
+template <typename Type> Value Evaluator::do_comparison_operation(parse::TokenKind kind, Type left, Type right) {
     switch (kind) {
     case parse::TokenKind::EqualEqual:
         return Value(left == right);
@@ -259,8 +256,8 @@ Value Evaluator::evaluate_unary(UnaryOperation& node) {
 
         // Plus and Minus unarys only work for numeric types
         if (!value.is_numeric()) {
-            report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
-                         value.get_type(), operator_to_string(node.op));
+            report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'", value.get_type(),
+                         operator_to_string(node.op));
             return {};
         }
 
@@ -290,8 +287,8 @@ Value Evaluator::evaluate_unary(UnaryOperation& node) {
         const bool* op_bool = value.get_if<bool>();
 
         if (!op_bool) {
-            report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'",
-                         value.get_type(), operator_to_string(node.op));
+            report_error(ErrorKind::Runtime, "Invalid operand type {} for unary operator '{}'", value.get_type(),
+                         operator_to_string(node.op));
             return {};
         }
 
@@ -317,6 +314,7 @@ Value Evaluator::evaluate_identifier(Identifier& node) {
 
 Value Evaluator::evaluate_declaration(VariableDeclaration& node) {
 
+    // We don't allow redeclarations, and since we only have the global scope for now, we just check global
     if (global.lookup(node.name)) {
         report_error(ErrorKind::Runtime, "Redeclaration of symbol '{}'", node.name);
         return {};
@@ -324,8 +322,33 @@ Value Evaluator::evaluate_declaration(VariableDeclaration& node) {
 
     Value value = evaluate(node.value);
 
+    // We make sure we don't accidentally allow `let i = i`
+    if (!value.valid) {
+        return value;
+    }
+
     global.define({node.name, value});
 
+    return value;
+}
+
+Value Evaluator::evaluate_assignment(VariableAssignment& node) {
+
+    // Undeclared variable use is invalid, and since we only have the global scope for now, we just check global
+    auto* variable = global.lookup(node.name);
+
+    if (!variable) {
+        report_error(ErrorKind::Runtime, "Unknown symbol '{}'", node.name);
+        return {};
+    }
+
+    Value value = evaluate(node.value);
+
+    if (!value.valid) {
+        return value;
+    }
+
+    variable->value = value;
     return value;
 }
 

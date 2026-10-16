@@ -58,6 +58,11 @@ void VariableDeclaration::print(std::ostream& out, i32 indent) const {
     value->print(out, indent + 2);
 }
 
+void VariableAssignment::print(std::ostream& out, i32 indent) const {
+    out << std::string(indent, ' ') << "VariableAssignment(" << name << ")\n";
+    value->print(out, indent + 2);
+}
+
 void BinaryOperation::print(std::ostream& out, i32 indent) const {
     out << std::string(indent, ' ') << "BinaryOperation(" << token_kind_to_string(op) << ")\n";
     left->print(out, indent + 2);

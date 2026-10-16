@@ -4,4 +4,5 @@ PointerAlignment: Left
 AccessModifierOffset: 0
 NamespaceIndentation: None
 AllowShortFunctionsOnASingleLine: None
-ColumnLimit: 100
+ColumnLimit: 130
+SortIncludes: CaseSensitive

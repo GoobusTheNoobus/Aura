@@ -130,9 +130,8 @@ std::ostream& operator<<(std::ostream& out, const std::vector<Token>& tokens) {
 }
 
 bool is_comparison(TokenKind kind) {
-    return kind == TokenKind::EqualEqual || kind == TokenKind::NotEqual ||
-           kind == TokenKind::LessEqualThan || kind == TokenKind::LessThan ||
-           kind == TokenKind::GreaterThan || kind == TokenKind::GreaterEqualThan;
+    return kind == TokenKind::EqualEqual || kind == TokenKind::NotEqual || kind == TokenKind::LessEqualThan ||
+           kind == TokenKind::LessThan || kind == TokenKind::GreaterThan || kind == TokenKind::GreaterEqualThan;
 }
 
 } // namespace aura::parse

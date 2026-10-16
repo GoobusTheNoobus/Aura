@@ -144,19 +144,24 @@ const std::vector<TestCase> Tests = {
     {"Sequences", "Semicolon separator", "1;2", "1\n2"},
     {"Sequences", "Three expressions", "1;2;3", "1\n2\n3"},
     {"Sequences", "Independent expressions", "1 + 2; 3 * 4; 5 - 1", "3\n12\n4"},
-    {"Sequences", "Complex expression sequence", R"(1 + 2 * 3; !(4 > 5); "a" + "b")",
-     "7\ntrue\nab"},
+    {"Sequences", "Complex expression sequence", R"(1 + 2 * 3; !(4 > 5); "a" + "b")", "7\ntrue\nab"},
 
     // ==================================================
     // ================== Declarations ==================
     // ==================================================
 
     {"Declarations", "Variable Declaration", "let num = 3", "3"},
-    {"Declarations", "Expression Declaration", "let num = 4 / 3 + (5.5 + 12 % 3) - 3.5",
-     "3.333333"},
-    {"Declarations", "Variable Usage", R"(let str = "Hello, "; str + "world!")",
-     "Hello, \nHello, world!"},
+    {"Declarations", "Expression Declaration", "let num = 4 / 3 + (5.5 + 12 % 3) - 3.5", "3.333333"},
+    {"Declarations", "Variable Usage", R"(let str = "Hello, "; str + "world!")", "Hello, \nHello, world!"},
     {"Declarations", "Boolean Variable", "let yes = true || false; !yes", "true\nfalse"},
+
+    // ==================================================
+    // ================== Assignments ===================
+    // ==================================================
+
+    {"Assignments", "Normal Assignment", "let num = 3; num = 12", "3\n12"},
+    {"Assignments", "Different Type Assignment", "let num = 3; num = 'Hello, world!'", "3\nHello, world!"},
+    {"Assignments", "Chain Assignments", "let a = 0; let b = 0; a = b = 12", "0\n0\n12"},
 };
 
 TestResult run_test(const TestCase& test) {
@@ -205,8 +210,7 @@ int main() {
     std::size_t passed = 0;
     std::string current_category;
 
-    std::cout << '\n'
-              << Cyan << "================= AURA TEST SUITE =================" << Reset << '\n';
+    std::cout << '\n' << Cyan << "================= AURA TEST SUITE =================" << Reset << '\n';
 
     for (const auto& test : Tests) {
         if (test.category != current_category) {
@@ -236,8 +240,7 @@ int main() {
     const std::size_t failed = results.size() - passed;
 
     std::cout << "\n=====================================\n"
-              << "Tests: " << results.size() << " | Passed: " << passed << " | Failed: " << failed
-              << '\n';
+              << "Tests: " << results.size() << " | Passed: " << passed << " | Failed: " << failed << '\n';
 
     if (failed == 0) {
         std::cout << Green << "All tests passed! :D I knew you could do it" << Reset << '\n';

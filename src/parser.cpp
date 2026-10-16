@@ -46,30 +46,58 @@ Program Parser::parse() {
 
 std::unique_ptr<BaseAST> Parser::parse_expression() {
     switch (peek().kind) {
-    case TokenKind::KeywordLet: {
-        next();
-
-        std::string name = peek().value;
-        if (peek().kind == TokenKind::Identifier) {
-            next();
-        } else {
-            report_error(ErrorKind::Parsing, "Expected an identifier");
+    case TokenKind::KeywordLet:
+        return parse_declaration();
+    case TokenKind::Identifier:
+        if (peek(1).kind == TokenKind::Equal) {
+            return parse_assignment();
         }
 
-        if (peek().kind == TokenKind::Equal) {
-            next();
-        } else {
-            report_error(ErrorKind::Parsing, "Expected '=', got '{}'", peek().value);
-        }
+        // We only evaluate an assignment if the identifier is followed by a =
+        [[fallthrough]];
 
-        auto declaration = std::make_unique<VariableDeclaration>(name, parse_expression());
-        return declaration;
-    }
-
-    // We fallback to an expression.
     default:
         return parse_logical_or();
     }
+}
+
+std::unique_ptr<VariableDeclaration> Parser::parse_declaration() {
+    next();
+
+    std::string name = peek().value;
+    if (peek().kind == TokenKind::Identifier) {
+        next();
+    } else {
+        report_error(ErrorKind::Parsing, "Expected an identifier");
+    }
+
+    if (peek().kind == TokenKind::Equal) {
+        next();
+    } else {
+        report_error(ErrorKind::Parsing, "Expected '=', got '{}'", peek().value);
+    }
+
+    auto declaration = std::make_unique<VariableDeclaration>(name, parse_expression());
+    return declaration;
+}
+
+std::unique_ptr<VariableAssignment> Parser::parse_assignment() {
+
+    std::string name = peek().value;
+    if (peek().kind == TokenKind::Identifier) {
+        next();
+    } else {
+        report_error(ErrorKind::Parsing, "Expected an identifier");
+    }
+
+    if (peek().kind == TokenKind::Equal) {
+        next();
+    } else {
+        report_error(ErrorKind::Parsing, "Expected '=', got '{}'", peek().value);
+    }
+
+    auto declaration = std::make_unique<VariableAssignment>(name, parse_expression());
+    return declaration;
 }
 
 std::unique_ptr<BaseAST> Parser::parse_logical_or() {
@@ -128,9 +156,8 @@ std::unique_ptr<BaseAST> Parser::parse_relational() {
     auto left = parse_additive();
 
     // We loop until we can't see the operator that we are trying to parse.
-    while (!end() &&
-           (peek().kind == TokenKind::LessThan || peek().kind == TokenKind::LessEqualThan ||
-            peek().kind == TokenKind::GreaterThan || peek().kind == TokenKind::GreaterEqualThan)) {
+    while (!end() && (peek().kind == TokenKind::LessThan || peek().kind == TokenKind::LessEqualThan ||
+                      peek().kind == TokenKind::GreaterThan || peek().kind == TokenKind::GreaterEqualThan)) {
         TokenKind op = next().kind;
 
         // After parsing the right hand side, we create a binary op storing both the left and the
@@ -164,8 +191,7 @@ std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
     auto left = parse_unary();
 
     // We loop until we can't see the operator that we are trying to parse.
-    while (!end() && (peek().kind == TokenKind::Star || peek().kind == TokenKind::Slash ||
-                      peek().kind == TokenKind::Percent)) {
+    while (!end() && (peek().kind == TokenKind::Star || peek().kind == TokenKind::Slash || peek().kind == TokenKind::Percent)) {
         TokenKind op = next().kind;
 
         // After parsing the right hand side, we create a binary op storing both the left and the
@@ -178,8 +204,7 @@ std::unique_ptr<BaseAST> Parser::parse_multiplicative() {
 }
 
 std::unique_ptr<BaseAST> Parser::parse_unary() {
-    if (!end() && (peek().kind == TokenKind::Plus || peek().kind == TokenKind::Minus ||
-                   peek().kind == TokenKind::LogicalNot)) {
+    if (!end() && (peek().kind == TokenKind::Plus || peek().kind == TokenKind::Minus || peek().kind == TokenKind::LogicalNot)) {
         TokenKind op = next().kind;
 
         // We recursively parse this function, that way, if we have +-+-3, it would parse all of it

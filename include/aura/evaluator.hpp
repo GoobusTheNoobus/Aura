@@ -48,13 +48,14 @@ struct Evaluator {
     // Evaluates the declaration of a variable like `let x = 4`
     Value evaluate_declaration(VariableDeclaration& node);
 
+    // Evaluates the assignment of a variable that should have already been declared
+    Value evaluate_assignment(VariableAssignment& node);
+
     // Apply numeric operators to the provided operands while enforcing Aura's type rules.
-    template <typename Type>
-    Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);
+    template <typename Type> Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);
 
     // Apply comparison operators and return their boolean result.
-    template <typename Type>
-    Value do_comparison_operation(parse::TokenKind kind, Type left, Type right);
+    template <typename Type> Value do_comparison_operation(parse::TokenKind kind, Type left, Type right);
 };
 
 } // namespace aura::interpreter

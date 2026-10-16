@@ -43,6 +43,7 @@ enum class ASTKind {
     UnaryOperation,
 
     VariableDeclaration,
+    VariableAssignment,
 
     Error,
 };
@@ -120,15 +121,24 @@ struct VariableDeclaration : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
+// Represents a variable assigment (to an existing variable)
+struct VariableAssignment : BaseAST {
+    std::unique_ptr<BaseAST> value;
+    std::string name;
+
+    VariableAssignment(std::string name, std::unique_ptr<BaseAST> value)
+        : BaseAST(ASTKind::VariableAssignment), value(std::move(value)), name(std::move(name)) {
+    }
+    void print(std::ostream& out, i32 indent) const override;
+};
+
 // Represents an operation with 2 operands.
 struct BinaryOperation : BaseAST {
     std::unique_ptr<BaseAST> left, right;
     parse::TokenKind op;
 
-    BinaryOperation(std::unique_ptr<BaseAST> left, std::unique_ptr<BaseAST> right,
-                    parse::TokenKind op)
-        : BaseAST(ASTKind::BinaryOperation), left(std::move(left)), right(std::move(right)),
-          op(op) {
+    BinaryOperation(std::unique_ptr<BaseAST> left, std::unique_ptr<BaseAST> right, parse::TokenKind op)
+        : BaseAST(ASTKind::BinaryOperation), left(std::move(left)), right(std::move(right)), op(op) {
     }
     void print(std::ostream& out, i32 indent) const override;
 };

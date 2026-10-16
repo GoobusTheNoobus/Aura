@@ -72,6 +72,14 @@ struct Parser {
     // Parse literals, identifiers, and parenthesized expressions.
     std::unique_ptr<BaseAST> parse_primary();
 
+    // Special non-operator parsing functions
+
+    // Variable declaration
+    std::unique_ptr<VariableDeclaration> parse_declaration();
+
+    // Variable assignments
+    std::unique_ptr<VariableAssignment> parse_assignment();
+
     // Returns true when the parser is at the final EOF token.
     bool end() const;
 
