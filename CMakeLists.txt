@@ -14,17 +14,17 @@ target_compile_options(aura PRIVATE
 
     # Debug info + sanitizer for debug
     $<$<CONFIG:Debug>:
-        -g
-        -O0
-        -fno-omit-frame-pointer
-        -fsanitize=address,undefined
+    -g
+    -O0
+    -fno-omit-frame-pointer
+    -fsanitize=address,undefined
     >
-    
+
     # Optimizations for release
     $<$<CONFIG:Release>:
-        -O3
-        -DNDEBUG
-        -march=native
+    -O3
+    -DNDEBUG
+    -march=native
     >
 
     # Compiler warning flags
@@ -37,8 +37,8 @@ target_compile_options(aura PRIVATE
 target_link_options(aura PRIVATE
     # for sanitizers
     $<$<CONFIG:Debug>:
-        -g
-        -fsanitize=address,undefined
+    -g
+    -fsanitize=address,undefined
     >
 )
 
@@ -50,6 +50,7 @@ set(AURA_SOURCES
     src/value.cpp
     src/scope.cpp
     src/ast.cpp
+    src/interpreter.cpp
 
     include/aura/token.hpp
     include/aura/lexer.hpp
@@ -60,20 +61,21 @@ set(AURA_SOURCES
     include/aura/evaluator.hpp
     include/aura/value.hpp
     include/aura/scope.hpp
+    include/aura/interpreter.hpp
 )
 
-target_sources(aura PRIVATE 
+target_sources(aura PRIVATE
     src/main.cpp
     ${AURA_SOURCES}
 )
 
 # Testing
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_executable(aura_test)
 
-    target_sources(aura_test PRIVATE 
+    target_sources(aura_test PRIVATE
         tests/test.cpp
         ${AURA_SOURCES}
     )
     target_include_directories(aura_test PRIVATE include)
-endif()
+endif ()

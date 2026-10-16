@@ -17,8 +17,6 @@
  * All rights reserved.
  */
 
-#define VERSION "0.1.0"
-
 #include "aura/diagnostic.hpp"
 #include "aura/evaluator.hpp"
 #include "aura/lexer.hpp"

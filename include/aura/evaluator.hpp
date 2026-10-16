@@ -32,10 +32,10 @@ struct Evaluator {
     // Evaluate a single AST node and return its runtime value.
     Value evaluate(std::unique_ptr<BaseAST>& node);
 
-    private:
     // Variables
     Scope global;
 
+    private:
     // Evaluate a binary operation by recursively evaluating both operands.
     Value evaluate_binary(BinaryOperation& node);
 
