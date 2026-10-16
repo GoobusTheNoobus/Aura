@@ -19,12 +19,28 @@
 
 #include "aura/interpreter.hpp"
 
+#include "aura/diagnostic.hpp"
+
 namespace aura::interpreter {
 
 Interpreter::Interpreter() {
     evaluator.global.define({"_AuraVersion", Value(VERSION)});
     evaluator.global.define({"_AuraAuthor", Value("GoobusTheNoobus")});
     evaluator.global.define({"_FunnyNumber", Value(67)});
+}
+
+void Interpreter::run(Program& program) {
+    for (auto& node : program.children) {
+        run(node);
+
+        if (error_encountered) {
+            break;
+        }
+    }
+}
+
+void Interpreter::run(std::unique_ptr<BaseAST>& node) {
+    evaluator.evaluate(node);
 }
 
 } // namespace aura::interpreter

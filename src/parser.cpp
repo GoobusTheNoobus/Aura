@@ -31,6 +31,11 @@ Program Parser::parse() {
 
     // we loop and parse until we reach the end of the file
     while (!end()) {
+
+        if (peek().kind == TokenKind::Separator) {
+            next();
+        }
+
         // Only expressions are handled as of right now.
         program.children.push_back(parse_expression());
 

@@ -31,10 +31,12 @@ struct Interpreter {
     Interpreter();
 
     // Runs a processed Program node
-    void run(const Program& program);
+    void run(Program& program);
 
     private:
     Evaluator evaluator;
+
+    void run(std::unique_ptr<BaseAST>& node);
 };
 
 } // namespace aura::interpreter

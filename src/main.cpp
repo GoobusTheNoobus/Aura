@@ -19,6 +19,8 @@
 
 #include "aura/diagnostic.hpp"
 #include "aura/evaluator.hpp"
+#include "aura/files.hpp"
+#include "aura/interpreter.hpp"
 #include "aura/lexer.hpp"
 #include "aura/parser.hpp"
 
@@ -29,8 +31,45 @@ using namespace aura;
 using namespace aura::parse;
 using namespace aura::interpreter;
 
-int main() {
+static int repl();
 
+int main(int argc, char* argv[]) {
+
+    // No arguments are given, so we run an interactive console
+    if (argc == 1) {
+        return repl();
+    }
+
+    std::string filename = argv[1];
+
+    auto file = files::read(filename);
+    if (!file) {
+        std::cerr << "Cannot open file " << filename << std::endl;
+        return 1;
+    }
+
+    std::string input = *file;
+
+    Lexer lexer(input);
+    std::vector<Token> tokens = lexer.tokenize();
+    if (error_encountered) {
+        return 1;
+    }
+
+    Parser parser(tokens);
+    Program program = parser.parse();
+
+    if (error_encountered) {
+        return 1;
+    }
+
+    Interpreter interpreter;
+    interpreter.run(program);
+
+    return error_encountered ? 1 : 0;
+}
+
+int repl() {
     std::cout << "Aura " VERSION " Interactive Console\n";
     std::cout << "Type `help` if you are confused.\n";
     std::cout << "Type `quit` to exit this console.\n";
@@ -54,9 +93,8 @@ int main() {
             return 0;
         }
 
-        else if (input == "help") {
-            std::cout << "Aura is a toy interpreter for the Aura Programming "
-                         "Language.\n"
+        if (input == "help") {
+            std::cout << "Aura is a toy interpreter for the Aura Programming Language.\n"
                          "Version: " VERSION "\n";
             continue;
         }
@@ -71,7 +109,6 @@ int main() {
         Program program = parser.parse();
 
         if (error_encountered) {
-            // program.print(std::cout, 0);
             continue;
         }
 

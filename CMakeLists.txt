@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(aura)
+add_executable(aura
+    include/aura/files.hpp)
 
 target_include_directories(aura PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
