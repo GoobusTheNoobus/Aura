@@ -51,6 +51,9 @@ struct Evaluator {
     // Evaluates the assignment of a variable that should have already been declared
     Value evaluate_assignment(VariableAssignment& node);
 
+    // Evaluates a print statement
+    Value evaluate_print(PrintStatement& node);
+
     // Apply numeric operators to the provided operands while enforcing Aura's type rules.
     template <typename Type> Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);
 

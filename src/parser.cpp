@@ -23,6 +23,7 @@
 #include "aura/token.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace aura::parse {
 
@@ -53,6 +54,9 @@ std::unique_ptr<BaseAST> Parser::parse_expression() {
     switch (peek().kind) {
     case TokenKind::KeywordLet:
         return parse_declaration();
+    case TokenKind::KeywordPrint:
+    case TokenKind::KeywordPrintln:
+        return parse_print();
     case TokenKind::Identifier:
         if (peek(1).kind == TokenKind::Equal) {
             return parse_assignment();
@@ -103,6 +107,28 @@ std::unique_ptr<VariableAssignment> Parser::parse_assignment() {
 
     auto declaration = std::make_unique<VariableAssignment>(name, parse_expression());
     return declaration;
+}
+
+std::unique_ptr<PrintStatement> Parser::parse_print() {
+    bool newline = peek().kind == TokenKind::KeywordPrintln;
+
+    std::vector<std::unique_ptr<BaseAST>> operands;
+
+    next(); // Consume `print` or `println`
+
+    if (!end() && peek().kind != TokenKind::Separator) {
+        do {
+            operands.push_back(parse_expression());
+
+            if (end() || peek().kind != TokenKind::Comma) {
+                break;
+            }
+
+            next(); // Consume comma
+        } while (!end());
+    }
+
+    return std::make_unique<PrintStatement>(std::move(operands), newline);
 }
 
 std::unique_ptr<BaseAST> Parser::parse_logical_or() {

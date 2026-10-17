@@ -28,6 +28,8 @@ std::string token_kind_to_string(TokenKind kind) {
         return "EOF";
     case parse::TokenKind::Separator:
         return "Separator";
+    case parse::TokenKind::Comma:
+        return "Comma";
     case parse::TokenKind::FloatLiteral:
         return "FloatLiteral";
     case parse::TokenKind::IntLiteral:
@@ -40,6 +42,10 @@ std::string token_kind_to_string(TokenKind kind) {
         return "Identifier";
     case parse::TokenKind::KeywordLet:
         return "KeywordLet";
+    case parse::TokenKind::KeywordPrint:
+        return "KeywordPrint";
+    case parse::TokenKind::KeywordPrintln:
+        return "KeywordPrintln";
     case parse::TokenKind::LeftParen:
         return "LeftParen";
     case parse::TokenKind::RightParen:

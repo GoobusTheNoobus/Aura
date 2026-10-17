@@ -21,6 +21,7 @@
 #include "aura/ast.hpp"
 
 #include <ostream>
+#include <stdexcept>
 #include <string>
 
 namespace aura::interpreter {
@@ -36,6 +37,8 @@ std::string Value::to_string() const {
         return *data;
     else if (const bool* data = get_if<bool>())
         return *data ? "true" : "false";
+    else if (get_if<Void>())
+        throw std::runtime_error("Attempted to print a void value");
 
     // Probably an error value, and shouldn't print
     return "null";
@@ -46,7 +49,7 @@ std::string Value::get_type() const {
     if (!valid)
         return "<error-type>";
 
-    constexpr const char* Map[]{"<null>", "<int>", "<float>", "<string>", "<bool>"};
+    constexpr const char* Map[]{"<void>", "<null>", "<int>", "<float>", "<string>", "<bool>"};
     return Map[data.index()];
 }
 

@@ -62,6 +62,10 @@ std::vector<Token> Lexer::tokenize() {
             tokens.push_back({")", TokenKind::RightParen});
             next();
             continue;
+        case ',':
+            tokens.push_back({",", TokenKind::Comma});
+            next();
+            continue;
         case '+':
             tokens.push_back({"+", TokenKind::Plus});
             next();
@@ -256,6 +260,16 @@ void Lexer::tokenize_word(std::vector<Token>& tokens) {
     // Keyword(s)
     if (value == "let") {
         tokens.push_back({value, TokenKind::KeywordLet});
+        return;
+    }
+
+    if (value == "print") {
+        tokens.push_back({value, TokenKind::KeywordPrint});
+        return;
+    }
+
+    if (value == "println") {
+        tokens.push_back({value, TokenKind::KeywordPrintln});
         return;
     }
 

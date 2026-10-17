@@ -162,6 +162,17 @@ const std::vector<TestCase> Tests = {
     {"Assignments", "Normal Assignment", "let num = 3; num = 12", "3\n12"},
     {"Assignments", "Different Type Assignment", "let num = 3; num = 'Hello, world!'", "3\nHello, world!"},
     {"Assignments", "Chain Assignments", "let a = 0; let b = 0; a = b = 12", "0\n0\n12"},
+
+    // ==================================================
+    // ==================== Printing ====================
+    // ==================================================
+
+    {"Printing", "Printing", "print 'Hello world!'", "Hello world!"},
+    {"Printing", "Printlning", "println 'Hello world!'", "Hello, world!"},
+    {"Printing", "Chained Printing", "println 'Number: ', 2", "Number: 2"},
+    {"Printing", "Nested Printing", "println println 'Number: ', 2", "Number: 2"},
+    {"Printing", "More Nested Printing", "println (println 'Number: ', 2), ' wow that was pretty nested!'",
+     "Number: 2\nwow that was pretty nested!"},
 };
 
 TestResult run_test(const TestCase& test) {

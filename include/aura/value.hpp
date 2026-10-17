@@ -24,6 +24,9 @@
 
 namespace aura::interpreter {
 
+// Represents the absense of a value, returned by functions that don't return anything
+struct Void {};
+
 // A runtime value in Aura. It stores the actual variant payload and a validity flag so invalid
 // expressions can propagate errors in a controlled way without crashing the interpreter.
 struct Value {
@@ -31,7 +34,7 @@ struct Value {
     // An invalid value is used to represent evaluation failures so the caller can detect and
     // report them without having to rely on exceptions for ordinary runtime errors.
     bool valid = false;
-    std::variant<std::monostate, i32, f64, std::string, bool> data;
+    std::variant<Void, std::monostate, i32, f64, std::string, bool> data;
 
     // Default constructor creates an invalid value used as an error sentinel.
     Value() = default;
@@ -54,6 +57,9 @@ struct Value {
 
     // Constructs a void value.
     Value(std::monostate) : valid(true), data(std::monostate{}) {
+    }
+
+    Value(Void) : valid(true), data(Void{}) {
     }
 
     std::string get_type() const;

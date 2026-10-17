@@ -30,6 +30,7 @@ namespace aura::parse {
 enum class TokenKind {
     EndOfFile,
     Separator,
+    Comma,
 
     Identifier,
 
@@ -39,6 +40,8 @@ enum class TokenKind {
     BooleanLiteral,
 
     KeywordLet,
+    KeywordPrint,
+    KeywordPrintln,
 
     Plus,
     Minus,

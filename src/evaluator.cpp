@@ -55,6 +55,10 @@ Value Evaluator::evaluate(std::unique_ptr<BaseAST>& node) {
     case ASTKind::VariableAssignment:
         return evaluate_assignment(static_cast<VariableAssignment&>(*node));
 
+    case ASTKind::PrintStatement: {
+        return evaluate_print(static_cast<PrintStatement&>(*node));
+    }
+
     default: {
         throw std::runtime_error("Unknown node kind id=" + std::to_string(static_cast<i32>(node->kind)));
     }
@@ -350,6 +354,28 @@ Value Evaluator::evaluate_assignment(VariableAssignment& node) {
 
     variable->value = value;
     return value;
+}
+
+Value Evaluator::evaluate_print(PrintStatement& node) {
+
+    for (auto& operand : node.operands) {
+        Value value = evaluate(operand);
+
+        if (!value.valid) {
+            return Value();
+        }
+
+        if (value.get_if<Void>()) {
+            continue;
+        }
+
+        std::cout << value.to_string();
+    }
+
+    if (node.newline)
+        std::cout << '\n';
+
+    return Value(Void());
 }
 
 } // namespace aura::interpreter

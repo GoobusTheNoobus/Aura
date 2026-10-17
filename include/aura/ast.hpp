@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace aura {
@@ -44,6 +45,8 @@ enum class ASTKind {
 
     VariableDeclaration,
     VariableAssignment,
+
+    PrintStatement,
 
     Error,
 };
@@ -130,6 +133,15 @@ struct VariableAssignment : BaseAST {
         : BaseAST(ASTKind::VariableAssignment), value(std::move(value)), name(std::move(name)) {
     }
     void print(std::ostream& out, i32 indent) const override;
+};
+
+struct PrintStatement : BaseAST {
+    std::vector<std::unique_ptr<BaseAST>> operands;
+    bool newline;
+
+    PrintStatement(std::vector<std::unique_ptr<BaseAST>> operands, bool newline)
+        : BaseAST(ASTKind::PrintStatement), operands(std::move(operands)), newline(newline) {
+    }
 };
 
 // Represents an operation with 2 operands.

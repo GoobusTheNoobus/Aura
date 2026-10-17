@@ -80,6 +80,9 @@ struct Parser {
     // Variable assignments
     std::unique_ptr<VariableAssignment> parse_assignment();
 
+    // Print statements
+    std::unique_ptr<PrintStatement> parse_print();
+
     // Returns true when the parser is at the final EOF token.
     bool end() const;
 

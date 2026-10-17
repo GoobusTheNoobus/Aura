@@ -23,6 +23,7 @@
 #include "aura/interpreter.hpp"
 #include "aura/lexer.hpp"
 #include "aura/parser.hpp"
+#include "aura/value.hpp"
 
 #include <iostream>
 #include <vector>
@@ -115,6 +116,10 @@ int repl() {
         for (auto& node : program.children) {
             Value value = evaluator.evaluate(node);
             if (error_encountered) {
+                continue;
+            }
+
+            if (value.get_if<Void>()) {
                 continue;
             }
 
