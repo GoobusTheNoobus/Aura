@@ -20,6 +20,7 @@
 #include "aura/evaluator.hpp"
 #include "aura/lexer.hpp"
 #include "aura/parser.hpp"
+#include "aura/value.hpp"
 
 #include <exception>
 #include <iostream>
@@ -168,10 +169,10 @@ const std::vector<TestCase> Tests = {
     // ==================================================
 
     {"Printing", "Printing", "print 'Hello world!'", "Hello world!"},
-    {"Printing", "Printlning", "println 'Hello world!'", "Hello, world!"},
+    {"Printing", "Printlning", "println 'Hello world!'", "Hello world!"},
     {"Printing", "Chained Printing", "println 'Number: ', 2", "Number: 2"},
-    {"Printing", "Nested Printing", "println println 'Number: ', 2", "Number: 2"},
-    {"Printing", "More Nested Printing", "println (println 'Number: ', 2), ' wow that was pretty nested!'",
+    {"Printing", "Nested Printing", "println println 'Number: ', 2", "Number: 2\n"},
+    {"Printing", "More Nested Printing", "println (println 'Number: ', 2), 'wow that was pretty nested!'",
      "Number: 2\nwow that was pretty nested!"},
 };
 
@@ -182,20 +183,32 @@ TestResult run_test(const TestCase& test) {
         aura::interpreter::Evaluator evaluator;
 
         auto ast = parser.parse();
-        std::string actual;
+        std::ostringstream out;
+
+        // We make so instead of printing to standard out, we print to our
+        // string stream
+        evaluator.out = &out;
 
         for (auto& node : ast.children) {
 
             // We separate each result with a new line character. However, not every single one gets
             // one. For example, 1 + 1; true doesn't become 2\ntrue\n, as there is no need for the
             // last \n
-            if (!actual.empty()) {
-                actual += '\n';
+
+            aura::interpreter::Value value = evaluator.evaluate(node);
+
+            if (value.get_if<aura::interpreter::Void>()) {
+                continue;
             }
 
-            std::ostringstream out;
-            out << evaluator.evaluate(node);
-            actual += out.str();
+            out << value.to_string() << std::endl;
+        }
+
+        std::string actual = out.str();
+
+        // Strip the last \n
+        if (actual.ends_with('\n')) {
+            actual.pop_back();
         }
 
         if (actual == test.expected) {

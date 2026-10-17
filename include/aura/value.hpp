@@ -18,7 +18,7 @@
  */
 
 #pragma once
-#include "ast.hpp"
+#include "core.hpp"
 #include <ostream>
 #include <variant>
 

@@ -369,11 +369,11 @@ Value Evaluator::evaluate_print(PrintStatement& node) {
             continue;
         }
 
-        std::cout << value.to_string();
+        *out << value.to_string();
     }
 
     if (node.newline)
-        std::cout << '\n';
+        *out << '\n';
 
     return Value(Void());
 }

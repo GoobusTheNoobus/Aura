@@ -22,6 +22,7 @@
 #include "scope.hpp"
 #include "token.hpp"
 #include "value.hpp"
+#include <iostream>
 #include <memory>
 
 namespace aura::interpreter {
@@ -29,6 +30,9 @@ namespace aura::interpreter {
 // The evaluator walks the AST and reduces each node to a concrete runtime value. It is the
 // runtime stage that performs arithmetic, comparisons, logical checks, and string concatenation.
 struct Evaluator {
+
+    std::ostream* out = &std::cout;
+
     // Evaluate a single AST node and return its runtime value.
     Value evaluate(std::unique_ptr<BaseAST>& node);
 
