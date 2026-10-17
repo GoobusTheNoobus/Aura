@@ -19,11 +19,6 @@ target_compile_options(aura PRIVATE
     -O0
     -fno-omit-frame-pointer
     -fsanitize=address,undefined
-
-    # Compiler warning flags
-    -Wall
-    -Wextra
-    -Wpedantic
     >
 
     # Optimizations for release
@@ -32,6 +27,12 @@ target_compile_options(aura PRIVATE
     -DNDEBUG
     -march=native
     >
+
+    -Wall
+    -Wpedantic
+
+    # Wextra isn't supported for MSVC compilers
+    $$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra>
 )
 
 # Executable linking flags
