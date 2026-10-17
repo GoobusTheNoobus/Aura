@@ -10,39 +10,36 @@ add_executable(aura
 
 target_include_directories(aura PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Object generation flags
-target_compile_options(aura PRIVATE
+if (MSVC)
+    target_compile_options(aura PRIVATE
+        /W4
+        /EHsc
+    )
+else()
+    target_compile_options(aura PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
 
-    # Debug info + sanitizer for debug
-    $<$<CONFIG:Debug>:
-    -g
-    -O0
-    -fno-omit-frame-pointer
-    -fsanitize=address,undefined
-    >
-
-    # Optimizations for release
-    $<$<CONFIG:Release>:
-    -O3
-    -DNDEBUG
-    -march=native
-    >
-
-    -Wall
-    -Wpedantic
-
-    # Wextra isn't supported for MSVC compilers
-    $$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra>
-)
-
-# Executable linking flags
-target_link_options(aura PRIVATE
-    # for sanitizers
-    $<$<CONFIG:Debug>:
-    -g
-    -fsanitize=address,undefined
-    >
-)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(aura PRIVATE
+            -g
+            -O0
+            -fno-omit-frame-pointer
+            -fsanitize=address,undefined
+        )
+        target_link_options(aura PRIVATE
+            -fsanitize=address,undefined
+        )
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        target_compile_options(aura PRIVATE
+            -O3
+            -DNDEBUG
+            -march=native
+        )
+    endif()
+endif()
 
 set(AURA_SOURCES
     src/token.cpp
