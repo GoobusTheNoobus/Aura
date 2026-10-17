@@ -1,0 +1,10 @@
+let str1 = "Hello"
+let str2 = "world!"
+let num = 67
+
+let msg = str1 + ' ' + str2
+let num_str = num + ""
+
+let final_msg = msg + num_str
+
+println final_msg

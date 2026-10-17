@@ -1,0 +1,9 @@
+let num1 = 6
+let num2 = 7
+let num3 = num1 + num2
+let funny = "" + num1 + num2 
+
+println "num1: ", num1 
+println "num2: ", num2 
+println "num3: ", num3 
+println "Funny number: ", funny
