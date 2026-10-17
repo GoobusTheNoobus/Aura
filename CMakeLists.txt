@@ -19,6 +19,11 @@ target_compile_options(aura PRIVATE
     -O0
     -fno-omit-frame-pointer
     -fsanitize=address,undefined
+
+    # Compiler warning flags
+    -Wall
+    -Wextra
+    -Wpedantic
     >
 
     # Optimizations for release
@@ -27,11 +32,6 @@ target_compile_options(aura PRIVATE
     -DNDEBUG
     -march=native
     >
-
-    # Compiler warning flags
-    -Wall
-    -Wextra
-    -Wpedantic
 )
 
 # Executable linking flags
