@@ -10,35 +10,30 @@ add_executable(aura
 
 target_include_directories(aura PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-if (MSVC)
+if(MSVC)
     target_compile_options(aura PRIVATE
         /W4
         /EHsc
+        $<$<CONFIG:Debug>:/Zi>
+        $<$<CONFIG:Release>:/O2>
     )
 else()
     target_compile_options(aura PRIVATE
         -Wall
         -Wextra
         -Wpedantic
+        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Debug>:-O0>
+        $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+        $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Release>:-DNDEBUG>
+        $<$<CONFIG:Release>:-march=native>
     )
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_options(aura PRIVATE
-            -g
-            -O0
-            -fno-omit-frame-pointer
-            -fsanitize=address,undefined
-        )
-        target_link_options(aura PRIVATE
-            -fsanitize=address,undefined
-        )
-    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        target_compile_options(aura PRIVATE
-            -O3
-            -DNDEBUG
-            -march=native
-        )
-    endif()
+    target_link_options(aura PRIVATE
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+    )
 endif()
 
 set(AURA_SOURCES
