@@ -18,7 +18,6 @@
  */
 
 #include "aura/value.hpp"
-#include "aura/ast.hpp"
 
 #include <ostream>
 #include <stdexcept>
@@ -49,7 +48,7 @@ std::string Value::get_type() const {
     if (!valid)
         return "<error-type>";
 
-    constexpr const char* Map[]{"<void>", "<null>", "<int>", "<float>", "<string>", "<bool>"};
+    constexpr const char* Map[]{"<void>", "<int>", "<float>", "<string>", "<bool>"};
     return Map[data.index()];
 }
 

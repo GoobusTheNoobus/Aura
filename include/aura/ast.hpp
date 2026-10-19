@@ -28,9 +28,7 @@
 
 namespace aura {
 
-// Each source expression is converted into an abstract syntax tree before it is evaluated.
-// The tree keeps the precedence and structure of the original program in a way that is easy
-// to traverse during parsing and evaluation.
+// Tagged along every single AST Node to identify the true underlying type of the node, without relying on RTTI.
 enum class ASTKind {
     Program,
 
@@ -51,6 +49,9 @@ enum class ASTKind {
     Error,
 };
 
+// The base class for all AST nodes. It provides a common interface for AST traversal, representation, and printing. Derived nodes
+// use the ASTKind enum declared above to identify their type, and will override print() to provide a node specific
+// stringification.
 struct BaseAST {
     ASTKind kind;
     BaseAST(ASTKind kind) : kind(kind) {
@@ -59,9 +60,11 @@ struct BaseAST {
     virtual void print(std::ostream& out, i32 indent) const;
 };
 
-// Wraps the entire source code
+// A countainer used to wrap all AST nodes within a program.
 struct Program : BaseAST {
-    // we use std::unique_ptr BaseAST for ambiguous nodes
+
+    // Uses std::unique_ptr since the node could be of different types. We could manage memory manually using normal pointers, but
+    // there is no good reason to. We cannot just use BaseAST plainly, since each node struct has different memory layouts.
     std::vector<std::unique_ptr<BaseAST>> children;
 
     Program() : BaseAST(ASTKind::Program) {
@@ -69,7 +72,7 @@ struct Program : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
-// Represents a variable
+// Represents a "word" that isn't a reserved keyword. It can be anything from a type name to a function name.
 struct Identifier : BaseAST {
     std::string name;
     Identifier(std::string name) : BaseAST(ASTKind::Identifier), name(std::move(name)) {
@@ -77,7 +80,7 @@ struct Identifier : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
-// Represent a raw integer literal
+// Represent a raw integer literal, in a signed 32-bit format.
 struct IntLiteral : BaseAST {
     i32 value;
 
@@ -86,7 +89,7 @@ struct IntLiteral : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
-// Represents a raw floating point literal
+// Represents a raw floating point literal in double precision floating point format.
 struct FloatLiteral : BaseAST {
     f64 value;
 
@@ -95,7 +98,7 @@ struct FloatLiteral : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
-// Represents a raw string literal
+// Represents a raw quote-enclosed string literal.
 struct StringLiteral : BaseAST {
     std::string value;
 
@@ -104,7 +107,7 @@ struct StringLiteral : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
-// Represents a true/false value
+// Represents a true/false value.
 struct BooleanLiteral : BaseAST {
     bool value;
 
@@ -113,7 +116,7 @@ struct BooleanLiteral : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
-// Represents a variable declaration
+// Represents a variable declaration (let x = y)
 struct VariableDeclaration : BaseAST {
     std::unique_ptr<BaseAST> value;
     std::string name;
@@ -127,6 +130,8 @@ struct VariableDeclaration : BaseAST {
 // Represents a variable assigment (to an existing variable)
 struct VariableAssignment : BaseAST {
     std::unique_ptr<BaseAST> value;
+
+    // We only support assignments to raw variable name, not a member access or anything.
     std::string name;
 
     VariableAssignment(std::string name, std::unique_ptr<BaseAST> value)
@@ -135,8 +140,11 @@ struct VariableAssignment : BaseAST {
     void print(std::ostream& out, i32 indent) const override;
 };
 
+// Represents a print/println
 struct PrintStatement : BaseAST {
     std::vector<std::unique_ptr<BaseAST>> operands;
+
+    // Depends on whether it is print or println, but there is no need for a seperate node.
     bool newline;
 
     PrintStatement(std::vector<std::unique_ptr<BaseAST>> operands, bool newline)

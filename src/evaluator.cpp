@@ -76,7 +76,7 @@ Value Evaluator::evaluate_binary(BinaryOperation& node) {
 
     // Void
     if (left.get_type() == "<void>" || right.get_type() == "<void>") {
-        return Value(std::monostate{});
+        return Value(Void());
     }
 
     // C++ variants are quite annoying

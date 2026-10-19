@@ -21,10 +21,10 @@
 
 #include "aura/ast.hpp"
 #include "evaluator.hpp"
-#include <string>
 
 namespace aura::interpreter {
 
+// Really just a wrapper for evaluator. Evaluator is doing all the work
 struct Interpreter {
 
     // Sets up variables

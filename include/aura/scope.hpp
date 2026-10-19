@@ -29,11 +29,17 @@ struct Symbol {
     Value value;
 };
 
+// A bit like one stack frame, or the global scope. All variables or functions are here.
 struct Scope {
+
+    // Returns a pointer to the lookup, nullptr if lookuped name doesn't exist.
     Symbol* lookup(const std::string& name);
+
+    // Defines a symbol, and overrides an old one if an old one exists (it shouldn't)
     void define(Symbol symbol);
 
     private:
+    // The internal hashmap storing the symbol name to the actual symbol, allowing O(1) lookups
     std::unordered_map<std::string, Symbol> map;
 };
 

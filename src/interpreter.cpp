@@ -23,6 +23,7 @@
 
 namespace aura::interpreter {
 
+// Define built-in variables and stuff
 Interpreter::Interpreter() {
     evaluator.global.define({"_AuraVersion", Value(VERSION)});
     evaluator.global.define({"_AuraAuthor", Value("GoobusTheNoobus")});

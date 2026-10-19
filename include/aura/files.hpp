@@ -25,6 +25,8 @@
 
 namespace aura::files {
 
+// Reads an entire file at once, given a path to read. Returns the string encapsulated by the std::optional. If failed, returns
+// std::nullopt
 inline std::optional<std::string> read(const std::string& path) {
 
     std::ifstream input(path);

@@ -7,3 +7,5 @@ println "num1: ", num1
 println "num2: ", num2 
 println "num3: ", num3 
 println "Funny number: ", funny
+
+println "Funny number but built in: ", _FunnyNumber
