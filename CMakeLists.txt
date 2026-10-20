@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(aura
-    src/files.hpp)
+    include/aura/files.hpp)
 
 target_include_directories(aura PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -51,25 +51,25 @@ else ()
 endif ()
 
 set(AURA_SOURCES
-    src/token.cpp
-    src/lexer.cpp
-    src/parser.cpp
-    src/evaluator.cpp
-    src/value.cpp
-    src/scope.cpp
-    src/ast.cpp
-    src/interpreter.cpp
+    src/aura/parse/token.cpp
+    src/aura/parse/lexer.cpp
+    src/aura/parse/parser.cpp
+    src/aura/interpreter/evaluator.cpp
+    src/aura/interpreter/value.cpp
+    src/aura/interpreter/scope.cpp
+    src/aura/ast.cpp
+    src/aura/interpreter/interpreter.cpp
 
-    src/token.hpp
-    src/lexer.hpp
-    src/ast.hpp
-    src/parser.hpp
-    src/core.hpp
-    src/diagnostic.hpp
-    src/evaluator.hpp
-    src/value.hpp
-    src/scope.hpp
-    src/interpreter.hpp
+    include/aura/parse/token.hpp
+    include/aura/parse/lexer.hpp
+    include/aura/ast.hpp
+    include/aura/parse/parser.hpp
+    include/aura/core.hpp
+    include/aura/diagnostic.hpp
+    include/aura/interpreter/evaluator.hpp
+    include/aura/interpreter/value.hpp
+    include/aura/interpreter/scope.hpp
+    include/aura/interpreter/interpreter.hpp
 )
 
 target_sources(aura PRIVATE

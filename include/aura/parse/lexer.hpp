@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "ast.hpp"
+#include "aura/ast.hpp"
 #include "token.hpp"
 #include <cstddef>
 #include <string>

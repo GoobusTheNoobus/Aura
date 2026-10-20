@@ -17,7 +17,9 @@
  * All rights reserved.
  */
 
-#include "ast.hpp"
+#pragma once
+
+#include "aura/ast.hpp"
 #include <cstddef>
 #include <memory>
 #include <vector>

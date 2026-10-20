@@ -18,8 +18,8 @@
  */
 
 #pragma once
-#include "core.hpp"
-#include "token.hpp"
+#include "aura/core.hpp"
+#include "aura/parse/token.hpp"
 
 #include <memory>
 #include <string>

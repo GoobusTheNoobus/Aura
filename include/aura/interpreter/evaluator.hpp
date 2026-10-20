@@ -18,10 +18,10 @@
  */
 
 #pragma once
-#include "ast.hpp"
-#include "scope.hpp"
-#include "token.hpp"
-#include "value.hpp"
+#include "aura/ast.hpp"
+#include "aura/interpreter/scope.hpp"
+#include "aura/interpreter/value.hpp"
+#include "aura/parse/token.hpp"
 #include <iostream>
 #include <memory>
 

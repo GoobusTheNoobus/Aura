@@ -17,30 +17,26 @@
  * All rights reserved.
  */
 
-#include "interpreter.hpp"
-#include "diagnostic.hpp"
+#pragma once
+
+#include "aura/ast.hpp"
+#include "aura/interpreter/evaluator.hpp"
 
 namespace aura::interpreter {
 
-// Define built-in variables and stuff
-Interpreter::Interpreter() {
-    evaluator.global.define({"_AuraVersion", Value(VERSION)});
-    evaluator.global.define({"_AuraAuthor", Value("GoobusTheNoobus")});
-    evaluator.global.define({"_FunnyNumber", Value(67)});
-}
+// Really just a wrapper for evaluator. Evaluator is doing all the work
+struct Interpreter {
 
-void Interpreter::run(Program& program) {
-    for (auto& node : program.children) {
-        run(node);
+    // Sets up variables
+    Interpreter();
 
-        if (error_encountered) {
-            break;
-        }
-    }
-}
+    // Runs a processed Program node
+    void run(Program& program);
 
-void Interpreter::run(std::unique_ptr<BaseAST>& node) {
-    evaluator.evaluate(node);
-}
+    private:
+    Evaluator evaluator;
+
+    void run(std::unique_ptr<BaseAST>& node);
+};
 
 } // namespace aura::interpreter

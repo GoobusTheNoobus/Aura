@@ -17,30 +17,30 @@
  * All rights reserved.
  */
 
-#pragma once
-#include "value.hpp"
-#include <string>
-#include <unordered_map>
+#include "aura/interpreter/interpreter.hpp"
+#include "aura/diagnostic.hpp"
 
 namespace aura::interpreter {
 
-struct Symbol {
-    std::string name;
-    Value value;
-};
+// Define built-in variables and stuff
+Interpreter::Interpreter() {
+    evaluator.global.define({"_AuraVersion", Value(VERSION)});
+    evaluator.global.define({"_AuraAuthor", Value("GoobusTheNoobus")});
+    evaluator.global.define({"_FunnyNumber", Value(67)});
+}
 
-// A bit like one stack frame, or the global scope. All variables or functions are here.
-struct Scope {
+void Interpreter::run(Program& program) {
+    for (auto& node : program.children) {
+        run(node);
 
-    // Returns a pointer to the lookup, nullptr if lookuped name doesn't exist.
-    Symbol* lookup(const std::string& name);
+        if (error_encountered) {
+            break;
+        }
+    }
+}
 
-    // Defines a symbol, and overrides an old one if an old one exists (it shouldn't)
-    void define(Symbol symbol);
-
-    private:
-    // The internal hashmap storing the symbol name to the actual symbol, allowing O(1) lookups
-    std::unordered_map<std::string, Symbol> map;
-};
+void Interpreter::run(std::unique_ptr<BaseAST>& node) {
+    evaluator.evaluate(node);
+}
 
 } // namespace aura::interpreter

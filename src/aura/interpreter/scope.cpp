@@ -17,7 +17,7 @@
  * All rights reserved.
  */
 
-#include "scope.hpp"
+#include "aura/interpreter/scope.hpp"
 
 namespace aura::interpreter {
 

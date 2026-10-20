@@ -17,7 +17,7 @@
  * All rights reserved.
  */
 
-#include "token.hpp"
+#include "aura/parse/token.hpp"
 
 namespace aura::parse {
 

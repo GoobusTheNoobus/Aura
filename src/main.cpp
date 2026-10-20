@@ -17,13 +17,13 @@
  * All rights reserved.
  */
 
-#include "diagnostic.hpp"
-#include "evaluator.hpp"
-#include "files.hpp"
-#include "interpreter.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
-#include "value.hpp"
+#include "aura/diagnostic.hpp"
+#include "aura/files.hpp"
+#include "aura/interpreter/evaluator.hpp"
+#include "aura/interpreter/interpreter.hpp"
+#include "aura/interpreter/value.hpp"
+#include "aura/parse/lexer.hpp"
+#include "aura/parse/parser.hpp"
 
 #include <iostream>
 #include <vector>

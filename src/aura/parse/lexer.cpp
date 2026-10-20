@@ -17,9 +17,9 @@
  * All rights reserved.
  */
 
-#include "lexer.hpp"
-#include "diagnostic.hpp"
-#include "token.hpp"
+#include "aura/parse/lexer.hpp"
+#include "aura/diagnostic.hpp"
+#include "aura/parse/token.hpp"
 
 namespace aura::parse {
 

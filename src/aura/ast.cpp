@@ -17,7 +17,7 @@
  * All rights reserved.
  */
 
-#include "ast.hpp"
+#include "aura/ast.hpp"
 
 namespace aura {
 
