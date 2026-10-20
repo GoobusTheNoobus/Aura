@@ -28,15 +28,19 @@ namespace aura::interpreter {
 struct Interpreter {
 
     // Sets up variables
-    Interpreter();
+    Interpreter(bool print_evaluated_values);
 
     // Runs a processed Program node
-    void run(Program& program);
+    int run(Program& program);
 
     private:
     Evaluator evaluator;
 
-    void run(std::unique_ptr<BaseAST>& node);
+    // In a repl shell or --eval context, we print the values that get evaluated, whereas when running a file, we discard unused
+    // values.
+    bool print_evaluated_values;
+
+    int run(std::unique_ptr<BaseAST>& node);
 };
 
 } // namespace aura::interpreter

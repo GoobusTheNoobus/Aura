@@ -23,8 +23,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(aura
-    include/aura/files.hpp)
+add_executable(aura)
 
 target_include_directories(aura PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -59,6 +58,7 @@ set(AURA_SOURCES
     src/aura/interpreter/scope.cpp
     src/aura/ast.cpp
     src/aura/interpreter/interpreter.cpp
+    src/aura/driver/driver.cpp
 
     include/aura/parse/token.hpp
     include/aura/parse/lexer.hpp

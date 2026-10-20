@@ -23,24 +23,40 @@
 namespace aura::interpreter {
 
 // Define built-in variables and stuff
-Interpreter::Interpreter() {
+Interpreter::Interpreter(bool print_evaluated_values) : print_evaluated_values(print_evaluated_values) {
     evaluator.global.define({"_AuraVersion", Value(VERSION)});
     evaluator.global.define({"_AuraAuthor", Value("GoobusTheNoobus")});
     evaluator.global.define({"_FunnyNumber", Value(67)});
 }
 
-void Interpreter::run(Program& program) {
+int Interpreter::run(Program& program) {
     for (auto& node : program.children) {
-        run(node);
+        int result = run(node);
 
-        if (error_encountered) {
-            break;
+        if (error_encountered || result != 0) {
+            return 1;
         }
     }
+
+    return 0;
 }
 
-void Interpreter::run(std::unique_ptr<BaseAST>& node) {
-    evaluator.evaluate(node);
+int Interpreter::run(std::unique_ptr<BaseAST>& node) {
+    Value value = evaluator.evaluate(node);
+
+    if (print_evaluated_values) {
+        if (error_encountered) {
+            return 1;
+        }
+
+        if (value.get_if<Void>()) {
+            return 0;
+        }
+
+        std::cout << value << std::endl;
+    }
+
+    return 0;
 }
 
 } // namespace aura::interpreter
