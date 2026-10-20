@@ -82,7 +82,7 @@ struct Identifier : BaseAST {
 
 // Represent a raw integer literal, in a signed 32-bit format.
 struct IntLiteral : BaseAST {
-    i32 value;
+    i32 value{};
 
     IntLiteral(i32 value) : BaseAST(ASTKind::IntLiteral), value(value) {
     }

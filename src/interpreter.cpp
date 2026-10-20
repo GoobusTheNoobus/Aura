@@ -17,9 +17,8 @@
  * All rights reserved.
  */
 
-#include "aura/interpreter.hpp"
-
-#include "aura/diagnostic.hpp"
+#include "interpreter.hpp"
+#include "diagnostic.hpp"
 
 namespace aura::interpreter {
 

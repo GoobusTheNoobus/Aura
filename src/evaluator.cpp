@@ -17,11 +17,11 @@
  * All rights reserved.
  */
 
-#include "aura/evaluator.hpp"
-#include "aura/ast.hpp"
-#include "aura/diagnostic.hpp"
-#include "aura/token.hpp"
-#include "aura/value.hpp"
+#include "evaluator.hpp"
+#include "ast.hpp"
+#include "diagnostic.hpp"
+#include "token.hpp"
+#include "value.hpp"
 
 #include <stdexcept>
 #include <string>

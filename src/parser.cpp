@@ -17,10 +17,10 @@
  * All rights reserved.
  */
 
-#include "aura/parser.hpp"
-#include "aura/ast.hpp"
-#include "aura/diagnostic.hpp"
-#include "aura/token.hpp"
+#include "parser.hpp"
+#include "ast.hpp"
+#include "diagnostic.hpp"
+#include "token.hpp"
 
 #include <memory>
 #include <vector>

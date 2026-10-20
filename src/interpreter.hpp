@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "aura/ast.hpp"
+#include "ast.hpp"
 #include "evaluator.hpp"
 
 namespace aura::interpreter {

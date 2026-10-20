@@ -17,13 +17,13 @@
  * All rights reserved.
  */
 
-#include "aura/diagnostic.hpp"
-#include "aura/evaluator.hpp"
-#include "aura/files.hpp"
-#include "aura/interpreter.hpp"
-#include "aura/lexer.hpp"
-#include "aura/parser.hpp"
-#include "aura/value.hpp"
+#include "diagnostic.hpp"
+#include "evaluator.hpp"
+#include "files.hpp"
+#include "interpreter.hpp"
+#include "lexer.hpp"
+#include "parser.hpp"
+#include "value.hpp"
 
 #include <iostream>
 #include <vector>
@@ -41,6 +41,48 @@ int main(int argc, char* argv[]) {
         return repl();
     }
 
+    std::string arg1 = argv[1];
+
+    if (arg1 == "--eval" || arg1 == "-e") {
+        if (argc <= 2) {
+            return 0;
+        }
+
+        std::string input = argv[2];
+
+        if (input.empty())
+            return 0;
+
+        Lexer lexer(input);
+        std::vector<Token> tokens = lexer.tokenize();
+        if (error_encountered) {
+            return 1;
+        }
+
+        Parser parser(tokens);
+        Program program = parser.parse();
+
+        if (error_encountered) {
+            return 1;
+        }
+
+        Evaluator evaluator;
+        for (auto& node : program.children) {
+            Value value = evaluator.evaluate(node);
+            if (error_encountered) {
+                return 1;
+            }
+
+            if (value.get_if<Void>()) {
+                continue;
+            }
+
+            std::cout << value << std::endl;
+        }
+
+        return 0;
+    }
+
     std::string filename = argv[1];
 
     auto file = files::read(filename);
@@ -49,7 +91,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::string input = *file;
+    const std::string& input = *file;
 
     Lexer lexer(input);
     std::vector<Token> tokens = lexer.tokenize();
@@ -80,12 +122,9 @@ int repl() {
 
     // We simulate a shell, evaluating whatever the user
     // puts in.
-    while (true) {
+    std::string input;
+    while (std::cout << " >>> " && std::getline(std::cin, input)) {
         error_encountered = false;
-        std::cout << " >>> ";
-
-        std::string input;
-        std::getline(std::cin, input);
 
         if (input.empty())
             continue;
@@ -126,4 +165,6 @@ int repl() {
             std::cout << value << std::endl;
         }
     }
+
+    return 0;
 }

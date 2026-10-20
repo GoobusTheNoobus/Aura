@@ -17,9 +17,9 @@
  * All rights reserved.
  */
 
-#include "aura/lexer.hpp"
-#include "aura/diagnostic.hpp"
-#include "aura/token.hpp"
+#include "lexer.hpp"
+#include "diagnostic.hpp"
+#include "token.hpp"
 
 namespace aura::parse {
 
@@ -32,10 +32,7 @@ std::vector<Token> Lexer::tokenize() {
     // A temporary token list to push to
     std::vector<Token> tokens;
 
-    // We iterate the source code while we aren't at the end.
-    // We don't use a for loop, since inside this big while loop contains
-    // multiple small while loops that can increment pos many times every
-    // iteration
+    // We use a while loop instead of a for loop, since each iteration can consume multiple characters
     while (!end()) {
         char current = peek();
 
@@ -80,9 +77,8 @@ std::vector<Token> Lexer::tokenize() {
             continue;
         case '/':
 
-            // The forward slash is a bit different, since we could
-            // be dealing with a single slash for division, or a double
-            // slash for comment.
+            // The forward slash is a bit different, since we could be dealing with a single slash for division, or a double slash
+            // for comment.
             if (peek(1) == '/') {
                 skip_comments();
                 continue;
@@ -222,8 +218,7 @@ void Lexer::tokenize_number(std::vector<Token>& tokens) {
     // We use this to track whether a dot has been encountered
     TokenKind kind = TokenKind::IntLiteral;
 
-    // We use this to track whether an error has been thrown. For
-    // example, 3.3.3.3 should only throw 1 error despite 3 extra dots.
+    // We use this to track whether an error has been thrown. For example, 3.3.3.3 should only throw 1 error despite 3 extra dots.
 
     bool error_encountered = false;
 

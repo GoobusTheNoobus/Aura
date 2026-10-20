@@ -17,7 +17,7 @@
  * All rights reserved.
  */
 
-#include "aura/value.hpp"
+#include "value.hpp"
 
 #include <ostream>
 #include <stdexcept>
