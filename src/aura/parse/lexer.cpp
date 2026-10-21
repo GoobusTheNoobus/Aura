@@ -59,6 +59,14 @@ std::vector<Token> Lexer::tokenize() {
             tokens.push_back({")", TokenKind::RightParen});
             next();
             continue;
+        case '{':
+            tokens.push_back({"{", TokenKind::LeftBrace});
+            next();
+            continue;
+        case '}':
+            tokens.push_back({"}", TokenKind::RightBrace});
+            next();
+            continue;
         case ',':
             tokens.push_back({",", TokenKind::Comma});
             next();

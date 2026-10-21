@@ -1,6 +1,6 @@
 # TODOs
 
-## Immediate changes
+## Refactor changes
 
 * Add a bit more abstraction
     * [X] Unflatten folder structure by grouping related files in smaller "submodules".
@@ -11,6 +11,7 @@
 ## Future roadmap
 
 * Add more language semantics
+    * [ ] Add blocks/local scoping
     * [ ] Add if/else statements
     * [ ] Add functions
     * [ ] Add data structures (arrays, hashmaps, array lists, hashsets, etc.).

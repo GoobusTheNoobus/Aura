@@ -74,6 +74,13 @@ void UnaryOperation::print(std::ostream& out, i32 indent) const {
     operand->print(out, indent + 2);
 }
 
+void Block::print(std::ostream& out, i32 indent) const {
+    out << std::string(indent, ' ') << "Block()\n";
+    for (auto& node : children) {
+        node->print(out, indent + 2);
+    }
+}
+
 void ErrorNode::print(std::ostream& out, i32 indent) const {
     out << std::string(indent, ' ') << "ErrorNode\n";
 }

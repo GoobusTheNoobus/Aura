@@ -80,6 +80,10 @@ std::string token_kind_to_string(TokenKind kind) {
         return "LogicalOr";
     case parse::TokenKind::LogicalNot:
         return "LogicalNot";
+    case parse::TokenKind::LeftBrace:
+        return "LeftBrace";
+    case parse::TokenKind::RightBrace:
+        return "RightBrace";
     default:
         return "Unknown";
     }

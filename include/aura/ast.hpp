@@ -45,6 +45,7 @@ enum class ASTKind {
     VariableAssignment,
 
     PrintStatement,
+    Block,
 
     Error,
 };
@@ -60,7 +61,7 @@ struct BaseAST {
     virtual void print(std::ostream& out, i32 indent) const;
 };
 
-// A countainer used to wrap all AST nodes within a program.
+// A container used to wrap all AST nodes within a program.
 struct Program : BaseAST {
 
     // Uses std::unique_ptr since the node could be of different types. We could manage memory manually using normal pointers, but
@@ -170,6 +171,14 @@ struct UnaryOperation : BaseAST {
 
     UnaryOperation(std::unique_ptr<BaseAST> operand, parse::TokenKind op)
         : BaseAST(ASTKind::UnaryOperation), operand(std::move(operand)), op(op) {
+    }
+    void print(std::ostream& out, i32 indent) const override;
+};
+
+struct Block : BaseAST {
+    std::vector<std::unique_ptr<BaseAST>> children;
+
+    Block(std::vector<std::unique_ptr<BaseAST>> children) : BaseAST(ASTKind::Block), children(std::move(children)) {
     }
     void print(std::ostream& out, i32 indent) const override;
 };

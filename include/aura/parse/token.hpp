@@ -63,6 +63,8 @@ enum class TokenKind {
 
     LeftParen,
     RightParen,
+    LeftBrace,
+    RightBrace,
 };
 
 // A token will store the previously defined TokenKind, as well as the
