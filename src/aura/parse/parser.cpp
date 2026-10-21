@@ -65,6 +65,9 @@ std::unique_ptr<BaseAST> Parser::parse_expression() {
         // We only evaluate an assignment if the identifier is followed by a =
         [[fallthrough]];
 
+    case TokenKind::LeftBrace:
+        return parse_block();
+    
     default:
         return parse_logical_or();
     }
@@ -129,6 +132,18 @@ std::unique_ptr<PrintStatement> Parser::parse_print() {
     }
 
     return std::make_unique<PrintStatement>(std::move(operands), newline);
+}
+
+std::unique_ptr<Block> Parser::parse_block() {
+    next(); // Consume opening brace, we can assume it's there.
+
+    auto block = std::make_unique<Block>();
+
+    while (!end() && peek().kind != TokenKind::RightBrace) {
+        block->children.push_back(parse_expression());
+    }
+
+    return block;
 }
 
 std::unique_ptr<BaseAST> Parser::parse_logical_or() {

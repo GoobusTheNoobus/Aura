@@ -178,7 +178,7 @@ struct UnaryOperation : BaseAST {
 struct Block : BaseAST {
     std::vector<std::unique_ptr<BaseAST>> children;
 
-    Block(std::vector<std::unique_ptr<BaseAST>> children) : BaseAST(ASTKind::Block), children(std::move(children)) {
+    Block() : BaseAST(ASTKind::Block) {
     }
     void print(std::ostream& out, i32 indent) const override;
 };

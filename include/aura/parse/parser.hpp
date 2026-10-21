@@ -85,6 +85,9 @@ struct Parser {
     // Print statements
     std::unique_ptr<PrintStatement> parse_print();
 
+    // Block scope
+    std::unique_ptr<Block> parse_block();
+    
     // Returns true when the parser is at the final EOF token.
     bool end() const;
 
