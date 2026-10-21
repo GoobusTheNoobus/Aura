@@ -122,6 +122,15 @@ TESTS = [
     ("Printing", "More nested printing",
      "println (println 'Number: ', 2), 'wow that was pretty nested!'",
      "Number: 2\nwow that was pretty nested!"),
+
+    # Blocks 
+    ("Blocks", "Empty Block", "{}", ""),
+    ("Blocks", "Variable Scope", "{let i = 0; println i}", "0"),
+    ("Blocks", "Block With Multiple Statements", "{let i = 1; println i; let j = 2; println j}", "1\n2"),
+    ("Blocks", "Nested Blocks", "{let i = 1; {let j = 2; println j}; println i}", "2\n1"),
+    ("Blocks", "Inner Scope Accessing Outer Variables", "{let i = 42; {println i}}", "42"), 
+    ("Blocks", "Inner Scope Accessing Changing Variables", "{let i = 42; {i = 67}; println i}", "67"), 
+    ("Blocks", "Variable Shadowing", "let n = 5; {let n = 'String'; println n}; println n", "5\nString\n5"), 
 ]
 
 # Ragebait messages

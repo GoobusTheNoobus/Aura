@@ -50,15 +50,16 @@ else ()
 endif ()
 
 set(AURA_SOURCES
-    src/aura/parse/token.cpp
-    src/aura/parse/lexer.cpp
-    src/aura/parse/parser.cpp
-    src/aura/interpreter/evaluator.cpp
-    src/aura/interpreter/value.cpp
-    src/aura/interpreter/scope.cpp
-    src/aura/ast.cpp
-    src/aura/interpreter/interpreter.cpp
-    src/aura/driver/driver.cpp
+    src/parse/token.cpp
+    src/parse/lexer.cpp
+    src/parse/parser.cpp
+    src/interpreter/evaluator.cpp
+    src/interpreter/value.cpp
+    src/interpreter/scope.cpp
+    src/ast.cpp
+    src/interpreter/interpreter.cpp
+    src/driver/driver.cpp
+    src/interpreter/scope_stack.cpp
 
     include/aura/parse/token.hpp
     include/aura/parse/lexer.hpp
@@ -70,6 +71,7 @@ set(AURA_SOURCES
     include/aura/interpreter/value.hpp
     include/aura/interpreter/scope.hpp
     include/aura/interpreter/interpreter.hpp
+    include/aura/interpreter/scope_stack.hpp
 )
 
 target_sources(aura PRIVATE

@@ -55,7 +55,7 @@ struct Value {
     Value(bool value) : valid(true), data(value) {
     }
 
-    //
+    // Void "value"
     Value(Void) : valid(true), data(Void{}) {
     }
 

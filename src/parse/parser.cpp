@@ -57,6 +57,8 @@ std::unique_ptr<BaseAST> Parser::parse_expression() {
     case TokenKind::KeywordPrint:
     case TokenKind::KeywordPrintln:
         return parse_print();
+    case TokenKind::LeftBrace:
+        return parse_block();
     case TokenKind::Identifier:
         if (peek(1).kind == TokenKind::Equal) {
             return parse_assignment();
@@ -65,9 +67,6 @@ std::unique_ptr<BaseAST> Parser::parse_expression() {
         // We only evaluate an assignment if the identifier is followed by a =
         [[fallthrough]];
 
-    case TokenKind::LeftBrace:
-        return parse_block();
-    
     default:
         return parse_logical_or();
     }
@@ -139,8 +138,30 @@ std::unique_ptr<Block> Parser::parse_block() {
 
     auto block = std::make_unique<Block>();
 
+    // we loop and parse until we reach the end of the file or right brace
     while (!end() && peek().kind != TokenKind::RightBrace) {
+
+        if (peek().kind == TokenKind::Separator) {
+            next();
+            continue;
+        }
+
+        // Only expressions are handled as of right now.
         block->children.push_back(parse_expression());
+
+        // Expect an expression seperator or end of file
+        if (peek().kind == TokenKind::Separator) {
+            next();
+        } else if (peek().kind != TokenKind::RightBrace && !end()) {
+            report_error(ErrorKind::Parsing, "Expected separator or '}}', got '{}'", peek().value);
+            break;
+        }
+    }
+
+    if (peek().kind == TokenKind::RightBrace) {
+        next(); // Consume '}'
+    } else {
+        report_error(ErrorKind::Parsing, "Expected '}}', got EOF");
     }
 
     return block;

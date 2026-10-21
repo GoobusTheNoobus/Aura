@@ -55,9 +55,11 @@ Value Evaluator::evaluate(std::unique_ptr<BaseAST>& node) {
     case ASTKind::VariableAssignment:
         return evaluate_assignment(static_cast<VariableAssignment&>(*node));
 
-    case ASTKind::PrintStatement: {
+    case ASTKind::PrintStatement:
         return evaluate_print(static_cast<PrintStatement&>(*node));
-    }
+
+    case ASTKind::Block:
+        return evaluate_block(static_cast<Block&>(*node));
 
     default: {
         throw std::runtime_error("Unknown node kind id=" + std::to_string(static_cast<i32>(node->kind)));
@@ -306,7 +308,7 @@ Value Evaluator::evaluate_unary(UnaryOperation& node) {
 
 Value Evaluator::evaluate_identifier(Identifier& node) {
 
-    Symbol* symbol = global.lookup(node.name);
+    Symbol* symbol = scopes.lookup_stack(node.name);
 
     if (!symbol) {
         report_error(ErrorKind::Runtime, "Unknown symbol '{}'", node.name);
@@ -318,8 +320,9 @@ Value Evaluator::evaluate_identifier(Identifier& node) {
 
 Value Evaluator::evaluate_declaration(VariableDeclaration& node) {
 
-    // We don't allow redeclarations, and since we only have the global scope for now, we just check global
-    if (global.lookup(node.name)) {
+    // We don't allow redeclarations, if it has been declared in the current scope.
+    // We do allow shadowing though, so we only check top.
+    if (scopes.lookup_top(node.name)) {
         report_error(ErrorKind::Runtime, "Redeclaration of symbol '{}'", node.name);
         return {};
     }
@@ -331,7 +334,12 @@ Value Evaluator::evaluate_declaration(VariableDeclaration& node) {
         return value;
     }
 
-    global.define({node.name, value});
+    if (value.get_type() == "<void>") {
+        report_error(ErrorKind::Runtime, "Cannot assign with a value of type <void>");
+        return value;
+    }
+
+    scopes.define({node.name, value});
 
     return value;
 }
@@ -339,7 +347,7 @@ Value Evaluator::evaluate_declaration(VariableDeclaration& node) {
 Value Evaluator::evaluate_assignment(VariableAssignment& node) {
 
     // Undeclared variable use is invalid, and since we only have the global scope for now, we just check global
-    auto* variable = global.lookup(node.name);
+    auto* variable = scopes.lookup_stack(node.name);
 
     if (!variable) {
         report_error(ErrorKind::Runtime, "Unknown symbol '{}'", node.name);
@@ -349,6 +357,11 @@ Value Evaluator::evaluate_assignment(VariableAssignment& node) {
     Value value = evaluate(node.value);
 
     if (!value.valid) {
+        return value;
+    }
+
+    if (value.get_type() == "<void>") {
+        report_error(ErrorKind::Runtime, "Cannot assign with a value of type <void>");
         return value;
     }
 
@@ -376,6 +389,22 @@ Value Evaluator::evaluate_print(PrintStatement& node) {
         *out << '\n';
 
     return Value(Void());
+}
+
+Value Evaluator::evaluate_block(Block& node) {
+    scopes.push();
+
+    for (auto& child : node.children) {
+        Value value = evaluate(child);
+
+        if (!value.valid) {
+            scopes.pop();
+            return {};
+        }
+    }
+
+    scopes.pop();
+    return Void();
 }
 
 } // namespace aura::interpreter

@@ -19,7 +19,7 @@
 
 #pragma once
 #include "aura/ast.hpp"
-#include "aura/interpreter/scope.hpp"
+#include "aura/interpreter/scope_stack.hpp"
 #include "aura/interpreter/value.hpp"
 #include "aura/parse/token.hpp"
 #include <iostream>
@@ -37,7 +37,7 @@ struct Evaluator {
     Value evaluate(std::unique_ptr<BaseAST>& node);
 
     // Variables
-    Scope global;
+    ScopeStack scopes;
 
     private:
     // Evaluate a binary operation by recursively evaluating both operands.
@@ -57,6 +57,9 @@ struct Evaluator {
 
     // Evaluates a print statement
     Value evaluate_print(PrintStatement& node);
+
+    // Runs a block
+    Value evaluate_block(Block& block);
 
     // Apply numeric operators to the provided operands while enforcing Aura's type rules.
     template <typename Type> Value do_numeric_operation(parse::TokenKind kind, Type left, Type right);

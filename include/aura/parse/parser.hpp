@@ -87,7 +87,7 @@ struct Parser {
 
     // Block scope
     std::unique_ptr<Block> parse_block();
-    
+
     // Returns true when the parser is at the final EOF token.
     bool end() const;
 

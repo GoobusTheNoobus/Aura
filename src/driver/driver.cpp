@@ -19,7 +19,6 @@
 
 #include "aura/driver/driver.hpp"
 #include "aura/diagnostic.hpp"
-#include "aura/interpreter/evaluator.hpp"
 #include "aura/interpreter/interpreter.hpp"
 #include "aura/parse/lexer.hpp"
 #include "aura/parse/parser.hpp"
@@ -28,6 +27,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace aura::driver {
 
@@ -146,6 +146,22 @@ int main(int argc, char* argv[]) {
         }
 
         return evaluate(argv[2]);
+    }
+
+    if (arg == "--lexa" || arg == "-l") {
+        if (argc < 3) {
+            std::cerr << "Expected source code after " << arg << '\n';
+            return 1;
+        }
+
+        std::string source = argv[2];
+
+        parse::Lexer lexer(source);
+        std::vector<parse::Token> tokens = lexer.tokenize();
+
+        std::cout << tokens;
+
+        return error_encountered;
     }
 
     return run_file(arg);

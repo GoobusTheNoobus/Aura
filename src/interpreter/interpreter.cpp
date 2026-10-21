@@ -24,9 +24,9 @@ namespace aura::interpreter {
 
 // Define built-in variables and stuff
 Interpreter::Interpreter(bool print_evaluated_values) : print_evaluated_values(print_evaluated_values) {
-    evaluator.global.define({"_AuraVersion", Value(VERSION)});
-    evaluator.global.define({"_AuraAuthor", Value("GoobusTheNoobus")});
-    evaluator.global.define({"_FunnyNumber", Value(67)});
+    evaluator.scopes.define({"_AuraVersion", Value(VERSION)});
+    evaluator.scopes.define({"_AuraAuthor", Value("GoobusTheNoobus")});
+    evaluator.scopes.define({"_FunnyNumber", Value(67)});
 }
 
 int Interpreter::run(Program& program) {
